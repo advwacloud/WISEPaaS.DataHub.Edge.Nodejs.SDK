@@ -1,0 +1,5 @@
+'use strict';
+module.exports = {
+  DEAFAULT_DATARECOVER_INTERVAL: 3000,
+  DEAFAULT_DATARECOVER_COUNT: 10
+};

@@ -1,0 +1,17 @@
+{
+  "name": "wisepaas-scada-edge-nodejs-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "garypan1990@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "3.0.0",
+    "request": "2.81.0",
+    "request-promise": "4.2.5",
+    "sqlite3": "4.1.1"
+  }
+}
