@@ -6,7 +6,6 @@ const { compressToBase64String, decompressFromBase64String } = require('./gZippe
 
 const _dbFilePath = path.resolve(process.cwd(), './recover.sqlite.db');
 let _db = {};
-
 function _init () {
   try {
     _db = new sqlite3.Database(_dbFilePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, error => {
@@ -60,6 +59,7 @@ function _read (count, callback) {
       const idList = [];
       const messageList = [];
       const resMsg = [];
+      console.log('read data');
       row.forEach(x => {
         idList.push(x.id);
         messageList.push(x.message);
@@ -79,20 +79,30 @@ function _read (count, callback) {
     console.error('Data recover read function error: ' + error);
   }
 }
-function _write (message) {
+function _write (messageAry) {
   try {
-    const result = compressToBase64String(message);
     _db.serialize(() => {
+      _db.run('BEGIN');
       _db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
         if (error) {
           console.error('Create data table error: ' + error);
           throw error;
         }
       });
-      _db.run('INSERT INTO Data (message) VALUES (@Message)', result);
+      for (const msg of messageAry) {
+        const result = compressToBase64String(msg);
+        _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
+          if (error) {
+            console.error('Insert data to database error: ' + error);
+            throw error;
+          }
+        });
+      }
+      _db.run('COMMIT');
     });
   } catch (error) {
     console.error('Data recover write error: ', error);
+    _db.run('ROLLBACK');
   }
 }
 

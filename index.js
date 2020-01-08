@@ -49,7 +49,7 @@ class EdgeAgent {
         }
         connHelper._connectMQTTorDCCS.call(this).then((client) => {
           this._client = client;
-          initEventFunction.call(this, this.connected, this.disconnected, this.messageReceived);
+          initEventFunction.call(this);
           callback(null, result);
           resolve(true);
         }, error => {
@@ -144,10 +144,10 @@ class EdgeAgent {
           return callback(err, result);
         }
         const msgArray = converter.convertData(data);
-        for (const msg of msgArray) {
-          if (this._client.connected === false) {
-            dataRecoverHelper.write(msg);
-          } else {
+        if (this._client.connected === false) {
+          dataRecoverHelper.write(msgArray);
+        } else {
+          for (const msg of msgArray) {
             this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 });
           }
         }
