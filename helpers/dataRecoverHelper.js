@@ -59,7 +59,6 @@ function _read (count, callback) {
       const idList = [];
       const messageList = [];
       const resMsg = [];
-      console.log('read data');
       row.forEach(x => {
         idList.push(x.id);
         messageList.push(x.message);
