@@ -148,7 +148,11 @@ class EdgeAgent {
           dataRecoverHelper.write(msgArray);
         } else {
           for (const msg of msgArray) {
-            this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 });
+            this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 }, (error) => {
+              if (error) {
+                dataRecoverHelper.write(msg);
+              }
+            });
           }
         }
         callback(null, result);

@@ -78,26 +78,29 @@ function _read (count, callback) {
     console.error('Data recover read function error: ' + error);
   }
 }
-function _write (messageAry) {
+function _write (message) {
   try {
     _db.serialize(() => {
       _db.run('BEGIN');
-      _db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
-        if (error) {
-          console.error('Create data table error: ' + error);
-          throw error;
-        }
-      });
-      for (const msg of messageAry) {
-        const result = compressToBase64String(msg);
-        _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
+      try {
+        _db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
           if (error) {
-            console.error('Insert data to database error: ' + error);
+            console.error('Create data table error: ' + error);
             throw error;
           }
         });
+        if (Array.isArray(message)) {
+          for (const msg of message) {
+            _writeMsgToDB(msg);
+          }
+        } else {
+          _writeMsgToDB(message);
+        }
+        _db.run('COMMIT');
+      } catch (error) {
+        console.error('Insert database error: ', error);
+        _db.run('ROLLBACK');
       }
-      _db.run('COMMIT');
     });
   } catch (error) {
     console.error('Data recover write error: ', error);
@@ -114,6 +117,15 @@ function queryString (idList) {
     }
   }
   return res;
+}
+function _writeMsgToDB (msg) {
+  const result = compressToBase64String(msg);
+  _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
+    if (error) {
+      console.error('Insert data to database error: ' + error);
+      throw error;
+    }
+  });
 }
 // function timeConvert (string) {
 //   // let timeNow = Date.now();
