@@ -56,6 +56,9 @@ class DeviceObject {
     if (deviceConfig.portNumber) {
       this.PNbr = deviceConfig.portNumber;
     }
+    if (deviceConfig.rp) {
+      this.RP = deviceConfig.rp;
+    }
     this.Tag = {};
     return this;
   }

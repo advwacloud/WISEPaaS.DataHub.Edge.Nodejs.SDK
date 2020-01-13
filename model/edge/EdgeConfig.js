@@ -18,7 +18,8 @@ class DeviceConfig {
     this.id = '';
     this.name = '';
     this.type = '';
-    this.description = ' ';
+    this.description = '';
+    this.rp = '';
     this.analogTagList = [];
     this.discreteTagList = [];
     this.textTagList = [];
