@@ -17,9 +17,6 @@ class EdgeAgentOptions {
     this.useSecure = options.useSecure ? options.useSecure : false;
 
     if (options.connectType === connectType.MQTT) {
-      assert(options.MQTT.hostName, 'MQTT host is required, please check the options for new an edgeAgent.');
-      assert(options.MQTT.username, 'MQTT user name is required, please check the options for new an edgeAgent.');
-      assert(options.MQTT.password, 'MQTT password is required, please check the options for new an edgeAgent.');
       this.MQTT = new MQTTOption(options.MQTT);
     } else {
       assert(options.DCCS.credentialKey, 'DCCS credentialkey is required, please check the options for new an edgeAgent.');
