@@ -5,18 +5,20 @@ class EdgeAgentOptions {
   constructor (options) {
     assert(options, 'No options to init EdgeAgent.');
     assert(options.scadaId, 'Scada ID is required.');
-
     this.autoReconnect = options.autoReconnect ? options.autoReconnect : false;
     this.reconnectInterval = options.reconnectInterval ? options.reconnectInterval : 1000;
     this.scadaId = options.scadaId ? options.scadaId : '';
     this.deviceId = options.deviceId ? options.deviceId : '';
     this.type = options.type && options.type <= Object.keys(edgeType).length ? options.type : edgeType.Gateway;
-    this.heartbeat = options.heartbeat ? options.heartbeat : 3000;
+    this.heartbeat = options.heartbeat ? options.heartbeat : 60000;
     this.dataRecover = options.dataRecover ? options.dataRecover : true;
     this.connectType = options.connectType && options.connectType <= Object.keys(connectType).length ? options.connectType : connectType.DCCS;
     this.useSecure = options.useSecure ? options.useSecure : false;
 
     if (options.connectType === connectType.MQTT) {
+      // if (!options.MQTT) {
+      //   options.MQTT = {};
+      // }
       this.MQTT = new MQTTOption(options.MQTT);
     } else {
       assert(options.DCCS.credentialKey, 'DCCS credentialkey is required, please check the options for new an edgeAgent.');

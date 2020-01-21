@@ -33,7 +33,7 @@ class EdgeAgent {
       _cfgAckTopic: `/wisepaas/scada/${options.scadaId}/cfgack`,
       _cmdTopic: options.type === edgeType.Gateway ? `/wisepaas/scada/${options.scadaId}/cmd` : `/wisepaas/scada/${options.scadaId}/${options.deviceId}/cmd`
     };
-    dataRecoverHelper.init();
+    // dataRecoverHelper.init();
   }
 
   connect (callback) {
@@ -151,6 +151,7 @@ class EdgeAgent {
             this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 }, (error) => {
               if (error) {
                 dataRecoverHelper.write(msg);
+                console.log('publish error = ' + error);
               }
             });
           }
@@ -199,6 +200,7 @@ function _mqttConnected (customerCallback) {
       this._heartBeatInterval = setInterval(sendHeartBeatMessage.bind(this), this._options.heartbeat);
     }
     if (this._options.dataRecover) {
+      dataRecoverHelper.init();
       this._dataRecoverInteval = setInterval(dataRecoverMessage.bind(this), constant.DEAFAULT_DATARECOVER_INTERVAL);
     }
     this._client.subscribe(this._mqttTopic._cmdTopic);

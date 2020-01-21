@@ -17,7 +17,7 @@ class ConfigMessage extends BaseMessage {
 }
 class ScadaObject {
   constructor (scadaId, scadaConfig, heartBeat) {
-    // this.Id = scadaId;
+    this.Id = scadaId;
     this.Name = scadaConfig.scada.name;
     if (scadaConfig.scada.description) {
       this.Desc = scadaConfig.scada.description;

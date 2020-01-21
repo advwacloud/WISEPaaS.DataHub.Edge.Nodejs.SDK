@@ -5,28 +5,30 @@ const sqlite3 = require('sqlite3').verbose();
 const { compressToBase64String, decompressFromBase64String } = require('./gZippedJson');
 
 const _dbFilePath = path.resolve(process.cwd(), './recover.sqlite.db');
-let _db = {};
-function _init () {
+let _db = null;
+function _init() {
   try {
-    _db = new sqlite3.Database(_dbFilePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, error => {
-      if (error) {
-        console.error('Establish database error: ' + error);
-      }
-    });
-    _db.serialize(() => {
-      _db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
+    if (!_db) {
+      _db = new sqlite3.Database(_dbFilePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, error => {
         if (error) {
-          console.error('Create data table error: ' + error);
-          throw error;
+          console.error('Establish database error: ' + error);
         }
       });
-      _db.exec('VACUUM');
-    });
+      _db.serialize(() => {
+        _db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
+          if (error) {
+            console.error('Create data table error: ' + error);
+            throw error;
+          }
+        });
+        _db.exec('VACUUM');
+      });
+    }
   } catch (error) {
     console.error('init database function error: ' + error);
   }
 }
-function _dataAvailable (callback) {
+function _dataAvailable(callback) {
   try {
     let result = false;
     if (!fs.existsSync(_dbFilePath)) {
@@ -49,7 +51,7 @@ function _dataAvailable (callback) {
     console.error('dataAvailable function error: ' + error);
   }
 }
-function _read (count, callback) {
+function _read(count, callback) {
   try {
     _db.all('SELECT * FROM Data LIMIT @Count', count, (error, row) => {
       if (error) {
@@ -68,7 +70,7 @@ function _read (count, callback) {
       }
       if (idList.length > 0) {
         _db.run(`DELETE FROM Data WHERE id IN (${queryString(idList)})`, idList, (error) => {
-          if (error)console.log(error);
+          if (error) console.log(error);
         });
       }
       // const msg = decompressFromBase64String(row.message);
@@ -78,7 +80,7 @@ function _read (count, callback) {
     console.error('Data recover read function error: ' + error);
   }
 }
-function _write (message) {
+function _write(message) {
   try {
     _db.serialize(() => {
       _db.run('BEGIN');
@@ -108,7 +110,7 @@ function _write (message) {
   }
 }
 
-function queryString (idList) {
+function queryString(idList) {
   let res = '';
   for (let i = 0; i < idList.length; i++) {
     res = res + '?';
@@ -118,7 +120,7 @@ function queryString (idList) {
   }
   return res;
 }
-function _writeMsgToDB (msg) {
+function _writeMsgToDB(msg) {
   const result = compressToBase64String(msg);
   _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
     if (error) {
