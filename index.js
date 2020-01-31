@@ -152,6 +152,9 @@ class EdgeAgent {
               if (error) {
                 dataRecoverHelper.write(msg);
                 console.log('publish error = ' + error);
+                result = false;
+                reject(error);
+                return callback(error, result);
               }
             });
           }
