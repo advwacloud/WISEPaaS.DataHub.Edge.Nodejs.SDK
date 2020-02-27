@@ -4,6 +4,7 @@ const assert = require('assert');
 const configMessage = require('../model/MQTTMessages/ConfigMessage');
 const { DataMessage } = require('../model/MQTTMessages/DataMessage');
 const { DeviceStatusMessage } = require('../model/MQTTMessages/DeviceStatusMessage');
+const constant = require('./const');
 
 function _convertWholeConfig (action, scadaId, edgeConfig, heartBeat) {
   try {
@@ -46,7 +47,7 @@ function _convertWholeConfig (action, scadaId, edgeConfig, heartBeat) {
     throw Error('Convert edge config to MQTT format error! error message: ' + error);
   }
 }
-function _convertData (data) {
+function _convertData (data, scadaId) {
   const result = [];
   let msg = new DataMessage();
   let count = 0;
@@ -57,7 +58,8 @@ function _convertData (data) {
     if (!msg.d[tag.deviceId]) {
       msg.d[tag.deviceId] = {};
     }
-    msg.d[tag.deviceId][tag.tagName] = tag.value;
+    _checkTypeOfTagValue(tag, scadaId);
+    msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, scadaId);
     count++;
     if (count === 100 || i === data.tagList.length - 1) {
       msg.ts = data.ts;
@@ -82,6 +84,62 @@ function _convertDeviceStatus (deviceStatus) {
     return msg;
   } catch (error) {
     console.log('error occured in convertDeviceStatus function, error: ' + error);
+  }
+}
+function _fractionDisplayFormat (tag, scadaId) {
+  try {
+    let edgentConfig = JSON.parse(constant.edgentConfig);
+    if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
+      let fractionVal = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].FDF;
+      if (fractionVal) {
+        if (typeof (tag.value) !== 'object') {
+          return Math.floor(tag.value * Math.pow(10, fractionVal)) / Math.pow(10, fractionVal);
+        } else {
+          for (let key in tag.value) {
+            tag.value[key] = Math.floor(tag.value[key] * Math.pow(10, fractionVal)) / Math.pow(10, fractionVal);
+          }
+          return tag.value;
+        }
+      } else {
+        return tag.value;
+      }
+    }
+  } catch (err) {
+    console.error('_fractionDisplayFormat ' + err);
+    throw Error(err);
+  }
+}
+function _checkTypeOfTagValue (tag, scadaId) {
+  let edgentConfig = JSON.parse(constant.edgentConfig);
+  if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
+    let type = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].Type;
+    switch (type) {
+      case 1:
+        if (typeof (tag.value) !== 'object') {
+          if (typeof (tag.value) !== 'number') {
+            throw Error('Tag Name: ' + tag.tagName + '. Type of value type is not number');
+          }
+        } else {
+          for (let key in tag.value) {
+            if (typeof (tag.value[key]) !== 'number') {
+              throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not number');
+            }
+          }
+        }
+        break;
+      case 2:
+        let RegExp = /^\d+$/;
+        let res = RegExp.test(tag.value);
+        if (!res) {
+          throw Error('Tag Name: ' + tag.tagName + '. Type of value is not positive integer.');
+        }
+        break;
+      case 3:
+        if (typeof (tag.value) !== 'string') {
+          throw Error('Tag Name: ' + tag.tagName + '. Type of value is not string.');
+        }
+        break;
+    }
   }
 }
 module.exports = {

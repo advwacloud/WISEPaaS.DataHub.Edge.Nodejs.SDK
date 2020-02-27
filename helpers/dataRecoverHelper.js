@@ -6,7 +6,7 @@ const { compressToBase64String, decompressFromBase64String } = require('./gZippe
 
 const _dbFilePath = path.resolve(process.cwd(), './recover.sqlite.db');
 let _db = null;
-function _init() {
+function _init () {
   try {
     if (!_db) {
       _db = new sqlite3.Database(_dbFilePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, error => {
@@ -28,7 +28,7 @@ function _init() {
     console.error('init database function error: ' + error);
   }
 }
-function _dataAvailable(callback) {
+function _dataAvailable (callback) {
   try {
     let result = false;
     if (!fs.existsSync(_dbFilePath)) {
@@ -51,7 +51,7 @@ function _dataAvailable(callback) {
     console.error('dataAvailable function error: ' + error);
   }
 }
-function _read(count, callback) {
+function _read (count, callback) {
   try {
     _db.all('SELECT * FROM Data LIMIT @Count', count, (error, row) => {
       if (error) {
@@ -80,7 +80,7 @@ function _read(count, callback) {
     console.error('Data recover read function error: ' + error);
   }
 }
-function _write(message) {
+function _write (message) {
   try {
     _db.serialize(() => {
       _db.run('BEGIN');
@@ -110,7 +110,7 @@ function _write(message) {
   }
 }
 
-function queryString(idList) {
+function queryString (idList) {
   let res = '';
   for (let i = 0; i < idList.length; i++) {
     res = res + '?';
@@ -120,7 +120,7 @@ function queryString(idList) {
   }
   return res;
 }
-function _writeMsgToDB(msg) {
+function _writeMsgToDB (msg) {
   const result = compressToBase64String(msg);
   _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
     if (error) {

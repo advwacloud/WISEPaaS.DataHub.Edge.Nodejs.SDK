@@ -1,5 +1,6 @@
 'use strict';
 const events = require('events').EventEmitter;
+const fs = require('fs');
 const { EdgeAgentOptions } = require('./model/edge/EdgeAgentOptions');
 const { actionType, edgeType, MessageType } = require('./common/enum');
 const connHelper = require('./helpers/connectHelper');
@@ -13,7 +14,6 @@ const { EdgeData, Tag } = require('./model/edge/EdgeData');
 const { EdgeDeviceStatus, DeviceStatus } = require('./model/edge/EdgeDeviceStatus');
 const { DisconnectMessage } = require('./model/MQTTMessages/DisconnectMessage');
 const { WriteValueCommand } = require('./model/edge/WriteValueCommand');
-
 class EdgeAgent {
   constructor (options) {
     this._options = new EdgeAgentOptions(options);
@@ -119,7 +119,8 @@ class EdgeAgent {
             break;
         }
         if (Object.keys(message) !== 0) {
-          this._client.publish(this._mqttTopic._configTopic, JSON.stringify(message), { qos: 1 });
+          let result = _checkConfigIdentical(message);
+          if (!result) this._client.publish(this._mqttTopic._configTopic, JSON.stringify(message), { qos: 1 });
         }
         callback(null, result);
         resolve(true);
@@ -143,7 +144,7 @@ class EdgeAgent {
           reject(err);
           return callback(err, result);
         }
-        const msgArray = converter.convertData(data);
+        const msgArray = converter.convertData(data, this._options.scadaId);
         if (this._client.connected === false) {
           dataRecoverHelper.write(msgArray);
         } else {
@@ -163,7 +164,6 @@ class EdgeAgent {
         resolve(true);
       } catch (error) {
         result = false;
-        console.log(error);
         reject(error);
         callback(error, result);
       }
@@ -291,7 +291,22 @@ function sendConnectMessage () {
 function closeMQTTClient () {
   this._client.end(true, []);
 }
-
+function _checkConfigIdentical (message) {
+  constant.edgentConfig = JSON.stringify(message.d);
+  if (!fs.existsSync(constant.configFilePath)) {
+    fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
+    return false;
+  } else {
+    let data = fs.readFileSync(constant.configFilePath);
+    data = JSON.parse(data);
+    if (JSON.stringify(data.d) === JSON.stringify(message.d)) {
+      return true;
+    } else {
+      fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
+      return false;
+    }
+  }
+}
 // function timeConvert (string) {
 //   // let timeNow = Date.now();
 //   const time = new Date();

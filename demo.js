@@ -129,7 +129,12 @@ function sendData (edgeConfig) {
     return;
   }
   const data = prepareData(edgeConfig.scada.deviceList.length, analogTagNum, discreteTagNum, textTagNum, arrayTagNum);
-  edgeAgent.sendData(data);
+  edgeAgent.sendData(data).then(res => {
+    console.log(res);
+  }, err => {
+    // clearInterval(sendTimer);
+    console.error(err);
+  });
 }
 function prepareData (numDeviceCount, numATagCount, numDTagCount, numTTagCount, numAryTagCount) {
   const data = new SDK.EdgeAgent.EdgeData();
@@ -138,7 +143,9 @@ function prepareData (numDeviceCount, numATagCount, numDTagCount, numTTagCount, 
       const ATag = new SDK.EdgeAgent.Tag();
       ATag.deviceId = 'Device' + i;
       ATag.tagName = 'ATag' + j;
-      ATag.value = Math.floor(Math.random() * 100) + 1;
+      // ATag.value = Math.floor(Math.random() * 100) + 1;
+      ATag.value = (Math.random() * 100) + 1;
+
       data.tagList.push(ATag);
     }
     for (let j = 1; j <= numDTagCount; j++) {
@@ -146,19 +153,22 @@ function prepareData (numDeviceCount, numATagCount, numDTagCount, numTTagCount, 
       DTag.deviceId = 'Device' + i;
       DTag.tagName = 'DTag' + j;
       DTag.value = j % 2;
+      // DTag.value = -1;
       data.tagList.push(DTag);
     }
     for (let j = 1; j <= numTTagCount; j++) {
       const TTag = new SDK.EdgeAgent.Tag();
       TTag.deviceId = 'Device' + i;
       TTag.tagName = 'TTag' + j;
-      TTag.value = 'TEST' + j.toString();
+      // TTag.value = 'TEST' + j.toString();
+      TTag.value = 1;
       data.tagList.push(TTag);
     }
     for (let j = 1; j <= numAryTagCount; j++) {
       const dic = {};
       for (let k = 0; k < 10; k++) {
-        dic[k.toString()] = Math.floor(Math.random() * 100) + 1;
+        // dic[k.toString()] = Math.floor(Math.random() * 100) + 1;
+        dic[k.toString()] = (Math.random() * 100) + 1;
       }
       const AryTag = new SDK.EdgeAgent.Tag();
       AryTag.deviceId = 'Device' + i;
