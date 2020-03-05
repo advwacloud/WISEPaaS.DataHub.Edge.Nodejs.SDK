@@ -1,6 +1,6 @@
 {
-  "name": "wisepaas-scada-edge-nodejs-sdk",
-  "version": "1.0.1",
+  "name": "wisepaas-datahub-edge-nodejs-sdk",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
