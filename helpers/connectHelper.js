@@ -3,10 +3,12 @@ const mqtt = require('mqtt');
 const request = require('request-promise');
 const { LastWillMessage } = require('../model/MQTTMessages/LastWillMessage');
 const { connectType } = require('../common/enum');
+const exec = require('child_process').exec;
 
 function _connectMQTTorDCCS () {
   return new Promise((resolve, reject) => {
     try {
+      _openvpnConnect.call(this);
       if (this._options.connectType === connectType.MQTT) {
         this._options.MQTT.will = {
           topic: `/wisepaas/scada/${this._options.scadaId}/conn`,
@@ -52,6 +54,19 @@ function _connectMQTTorDCCS () {
       reject(error);
     }
   });
+}
+
+function _openvpnConnect () {
+  try {
+    if (this._options.ovpnPath) {
+      let ovpnhandler = exec('../openvpn ' + this._options);
+      ovpnhandler.stdout.on('data', (data) => {
+        console.log(data);
+      });
+    }
+  } catch (error) {
+    console.error('openvpn error: ' + error);
+  }
 }
 
 module.exports = {

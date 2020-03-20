@@ -14,6 +14,7 @@ class EdgeAgentOptions {
     this.dataRecover = options.dataRecover ? options.dataRecover : true;
     this.connectType = options.connectType && options.connectType <= Object.keys(connectType).length ? options.connectType : connectType.DCCS;
     this.useSecure = options.useSecure ? options.useSecure : false;
+    this.ovpnPath = options.ovpnPath ? options.ovpnPath : '';
 
     if (options.connectType === connectType.MQTT) {
       // if (!options.MQTT) {
