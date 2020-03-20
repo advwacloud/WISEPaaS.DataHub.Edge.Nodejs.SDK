@@ -59,7 +59,7 @@ function _connectMQTTorDCCS () {
 function _openvpnConnect () {
   try {
     if (this._options.ovpnPath) {
-      let ovpnhandler = exec('../openvpn ' + this._options);
+      let ovpnhandler = exec('../openvpn ' + this._options.ovpnPath);
       ovpnhandler.stdout.on('data', (data) => {
         console.log(data);
       });
