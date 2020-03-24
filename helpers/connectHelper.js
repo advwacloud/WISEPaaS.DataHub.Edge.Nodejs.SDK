@@ -64,7 +64,7 @@ function _openvpnConnect () {
 
     } else if (os.platform() === Const.linux || os.platform() === Const.macOS) {
       if (this._options.ovpnPath) {
-        let ovpnhandler = exec('../vendor/openvpn ' + this._options.ovpnPath);
+        let ovpnhandler = exec('./vendor/openvpn ' + this._options.ovpnPath);
         ovpnhandler.stdout.on('data', (data) => {
           console.log(data);
         });
