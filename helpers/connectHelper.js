@@ -3,7 +3,9 @@ const mqtt = require('mqtt');
 const request = require('request-promise');
 const { LastWillMessage } = require('../model/MQTTMessages/LastWillMessage');
 const { connectType } = require('../common/enum');
+const Const = require('../common/const');
 const exec = require('child_process').exec;
+const os = require('os');
 
 function _connectMQTTorDCCS () {
   return new Promise((resolve, reject) => {
@@ -58,11 +60,15 @@ function _connectMQTTorDCCS () {
 
 function _openvpnConnect () {
   try {
-    if (this._options.ovpnPath) {
-      let ovpnhandler = exec('../openvpn ' + this._options.ovpnPath);
-      ovpnhandler.stdout.on('data', (data) => {
-        console.log(data);
-      });
+    if (os.platform() === Const.win32) {
+
+    } else if (os.platform() === Const.linux || os.platform() === Const.macOS) {
+      if (this._options.ovpnPath) {
+        let ovpnhandler = exec('../openvpn ' + this._options.ovpnPath);
+        ovpnhandler.stdout.on('data', (data) => {
+          console.log(data);
+        });
+      }
     }
   } catch (error) {
     console.error('openvpn error: ' + error);
