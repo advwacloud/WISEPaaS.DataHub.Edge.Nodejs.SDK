@@ -1,6 +1,7 @@
 
 'use strict';
 const assert = require('assert');
+const fs = require('fs');
 const configMessage = require('../model/MQTTMessages/ConfigMessage');
 const { DataMessage } = require('../model/MQTTMessages/DataMessage');
 const { DeviceStatusMessage } = require('../model/MQTTMessages/DeviceStatusMessage');
@@ -88,6 +89,9 @@ function _convertDeviceStatus (deviceStatus) {
 }
 function _fractionDisplayFormat (tag, scadaId) {
   try {
+    if (!fs.existsSync(constant.configFilePath)) {
+      return;
+    }
     let edgentConfig = JSON.parse(constant.edgentConfig);
     if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
       let fractionVal = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].FDF;
@@ -110,6 +114,9 @@ function _fractionDisplayFormat (tag, scadaId) {
   }
 }
 function _checkTypeOfTagValue (tag, scadaId) {
+  if (!fs.existsSync(constant.configFilePath)) {
+    return;
+  }
   let edgentConfig = JSON.parse(constant.edgentConfig);
   if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
     let type = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].Type;

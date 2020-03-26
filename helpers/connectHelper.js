@@ -68,6 +68,9 @@ function _openvpnConnect () {
         ovpnhandler.stdout.on('data', (data) => {
           console.log(data);
         });
+        ovpnhandler.stderr.on('data', (data) => {
+          console.error(`stderr: ${data}`);
+        });
       }
     }
   } catch (error) {
