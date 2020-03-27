@@ -59,8 +59,12 @@ function _convertData (data, scadaId) {
     if (!msg.d[tag.deviceId]) {
       msg.d[tag.deviceId] = {};
     }
-    _checkTypeOfTagValue(tag, scadaId);
-    msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, scadaId);
+    if (fs.existsSync(constant.configFilePath)) {
+      _checkTypeOfTagValue(tag, scadaId);
+      msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, scadaId);
+    } else {
+      msg.d[tag.deviceId][tag.tagName] = tag.value;
+    }
     count++;
     if (count === 100 || i === data.tagList.length - 1) {
       msg.ts = data.ts;
@@ -89,9 +93,6 @@ function _convertDeviceStatus (deviceStatus) {
 }
 function _fractionDisplayFormat (tag, scadaId) {
   try {
-    if (!fs.existsSync(constant.configFilePath)) {
-      return;
-    }
     let edgentConfig = JSON.parse(constant.edgentConfig);
     if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
       let fractionVal = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].FDF;
@@ -114,9 +115,6 @@ function _fractionDisplayFormat (tag, scadaId) {
   }
 }
 function _checkTypeOfTagValue (tag, scadaId) {
-  if (!fs.existsSync(constant.configFilePath)) {
-    return;
-  }
   let edgentConfig = JSON.parse(constant.edgentConfig);
   if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
     let type = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].Type;
