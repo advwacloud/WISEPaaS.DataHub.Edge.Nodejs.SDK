@@ -23,15 +23,15 @@ class EdgeAgent {
     // this._recoverHelper = new DataRecoverHelper();
     this.events = new events.EventEmitter();
     this._mqttTopic = {
-      // scadaCmdTopic: `/wisepaas/scada/${options.scadaId}/cmd`,
-      // deviceCmdTopic: `/wisepaas/scada/${options.scadaId}/${options.deviceId}/cmd`,
-      _configTopic: `/wisepaas/scada/${options.scadaId}/cfg`,
-      _dataTopic: `/wisepaas/scada/${options.scadaId}/data`,
-      _scadaConnTopic: `/wisepaas/scada/${options.scadaId}/conn`,
-      _deviceConnTopic: `/wisepaas/scada/${options.scadaId}/${options.deviceId}/conn`,
-      _ackTopic: `/wisepaas/scada/${options.scadaId}/ack`,
-      _cfgAckTopic: `/wisepaas/scada/${options.scadaId}/cfgack`,
-      _cmdTopic: options.type === edgeType.Gateway ? `/wisepaas/scada/${options.scadaId}/cmd` : `/wisepaas/scada/${options.scadaId}/${options.deviceId}/cmd`
+      // nodeCmdTopic: `/wisepaas/scada/${options.nodeId}/cmd`,
+      // deviceCmdTopic: `/wisepaas/scada/${options.nodeId}/${options.deviceId}/cmd`,
+      _configTopic: `/wisepaas/scada/${options.nodeId}/cfg`,
+      _dataTopic: `/wisepaas/scada/${options.nodeId}/data`,
+      _nodeConnTopic: `/wisepaas/scada/${options.nodeId}/conn`,
+      _deviceConnTopic: `/wisepaas/scada/${options.nodeId}/${options.deviceId}/conn`,
+      _ackTopic: `/wisepaas/scada/${options.nodeId}/ack`,
+      _cfgAckTopic: `/wisepaas/scada/${options.nodeId}/cfgack`,
+      _cmdTopic: options.type === edgeType.Gateway ? `/wisepaas/scada/${options.nodeId}/cmd` : `/wisepaas/scada/${options.nodeId}/${options.deviceId}/cmd`
     };
     // dataRecoverHelper.init();
   }
@@ -77,7 +77,7 @@ class EdgeAgent {
           return callback(err, result);
         }
         const msg = new DisconnectMessage();
-        const topic = this._options.type === edgeType.Gateway ? this._mqttTopic._scadaConnTopic : this._mqttTopic._deviceConnTopic;
+        const topic = this._options.type === edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
         this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true }, closeMQTTClient.bind(this, this.disconnected));
         clearInterval(this._heartBeatInterval);
         callback(null, result);
@@ -111,7 +111,7 @@ class EdgeAgent {
         }
         switch (action) {
           case actionType.create:
-            message = converter.convertWholeConfig(action, this._options.scadaId, edgeConfig, this._options.heartbeat);
+            message = converter.convertWholeConfig(action, this._options.nodeId, edgeConfig, this._options.heartbeat);
             break;
           case actionType.update:
             break;
@@ -144,7 +144,7 @@ class EdgeAgent {
           reject(err);
           return callback(err, result);
         }
-        const msgArray = converter.convertData(data, this._options.scadaId);
+        const msgArray = converter.convertData(data, this._options.nodeId);
         if (this._client.connected === false) {
           dataRecoverHelper.write(msgArray);
         } else {
@@ -176,7 +176,7 @@ class EdgeAgent {
     return new Promise((resolve, reject) => {
       try {
         const msg = converter.convertDeviceStatus(devieStatus);
-        this._client.publish(this._mqttTopic._scadaConnTopic, JSON.stringify(msg), { qos: 1, retain: true });
+        this._client.publish(this._mqttTopic._nodeConnTopic, JSON.stringify(msg), { qos: 1, retain: true });
         resolve(true);
         callback(null, result);
       } catch (error) {
@@ -280,12 +280,12 @@ function dataRecoverMessage () {
 }
 function sendHeartBeatMessage () {
   const msg = new HeartBeatMessage();
-  const topic = this._options.type === edgeType.Gateway ? this._mqttTopic._scadaConnTopic : this._mqttTopic._deviceConnTopic;
+  const topic = this._options.type === edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
   this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true });
 }
 function sendConnectMessage () {
   const msg = new ConnectMessage();
-  const topic = this._options.type === edgeType.Gateway ? this._mqttTopic._scadaConnTopic : this._mqttTopic._deviceConnTopic;
+  const topic = this._options.type === edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
   this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true });
 }
 function closeMQTTClient () {
@@ -315,7 +315,7 @@ function _checkConfigIdentical (message) {
 // }
 
 EdgeAgent.EdgeConfig = edgeConfig.EdgeConfig;
-EdgeAgent.ScadaConfig = edgeConfig.ScadaConfig;
+EdgeAgent.NodeConfig = edgeConfig.NodeConfig;
 EdgeAgent.DeviceConfig = edgeConfig.DeviceConfig;
 EdgeAgent.AnalogTagConfig = edgeConfig.AnalogTagConfig;
 EdgeAgent.DiscreteTagConfig = edgeConfig.DiscreteTagConfig;

@@ -13,7 +13,7 @@ function _connectMQTTorDCCS () {
       _openvpnConnect.call(this);
       if (this._options.connectType === connectType.MQTT) {
         this._options.MQTT.will = {
-          topic: `/wisepaas/scada/${this._options.scadaId}/conn`,
+          topic: `/wisepaas/scada/${this._options.nodeId}/conn`,
           payload: JSON.stringify(new LastWillMessage()),
           qos: 1,
           retain: true
@@ -41,7 +41,7 @@ function _connectMQTTorDCCS () {
             mqttOptions.password = credential.protocols.mqtt.password;
           }
           mqttOptions.will = {
-            topic: `/wisepaas/scada/${this._options.scadaId}/conn`,
+            topic: `/wisepaas/scada/${this._options.nodeId}/conn`,
             payload: JSON.stringify(new LastWillMessage()),
             qos: 1,
             retain: true

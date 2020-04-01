@@ -17,8 +17,8 @@ module.exports = {
     update: 2,
     delete: 3
   },
-  SCADAConfigType: {
-    SCADA: 1,
+  NODEConfigType: {
+    NODE: 1,
     gateway: 2,
     virtualGroup: 3
   },

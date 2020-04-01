@@ -7,12 +7,12 @@ const { DataMessage } = require('../model/MQTTMessages/DataMessage');
 const { DeviceStatusMessage } = require('../model/MQTTMessages/DeviceStatusMessage');
 const constant = require('./const');
 
-function _convertWholeConfig (action, scadaId, edgeConfig, heartBeat) {
+function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
   try {
     const msg = new configMessage.ConfigMessage();
     msg.d.Action = action;
-    const scadaObj = new configMessage.ScadaObject(scadaId, edgeConfig, heartBeat);
-    for (var device of edgeConfig.scada.deviceList) {
+    const nodeObj = new configMessage.NodeObject(nodeId, edgeConfig, heartBeat);
+    for (var device of edgeConfig.node.deviceList) {
       assert(device.id, 'Device Id is required, please check the edge config properties.');
       assert(device.name, 'Device name is required, please check the edge config properties.');
       assert(device.type, 'Device type is required, please check the edge config properties.');
@@ -38,17 +38,17 @@ function _convertWholeConfig (action, scadaId, edgeConfig, heartBeat) {
           deviceObj.Tag[textTag.name] = textTagObj;
         }
       }
-      scadaObj.Device[device.id] = deviceObj;
+      nodeObj.Device[device.id] = deviceObj;
       // console.log(deviceObj);
     }
-    // console.log(scadaObj);
-    msg.d.Scada[scadaId] = scadaObj;
+    // console.log(nodeObj);
+    msg.d.Scada[nodeId] = nodeObj;
     return msg;
   } catch (error) {
     throw Error('Convert edge config to MQTT format error! error message: ' + error);
   }
 }
-function _convertData (data, scadaId) {
+function _convertData (data, nodeId) {
   const result = [];
   let msg = new DataMessage();
   let count = 0;
@@ -60,8 +60,8 @@ function _convertData (data, scadaId) {
       msg.d[tag.deviceId] = {};
     }
     if (fs.existsSync(constant.configFilePath)) {
-      _checkTypeOfTagValue(tag, scadaId);
-      msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, scadaId);
+      _checkTypeOfTagValue(tag, nodeId);
+      msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, nodeId);
     } else {
       msg.d[tag.deviceId][tag.tagName] = tag.value;
     }
@@ -91,11 +91,11 @@ function _convertDeviceStatus (deviceStatus) {
     console.log('error occured in convertDeviceStatus function, error: ' + error);
   }
 }
-function _fractionDisplayFormat (tag, scadaId) {
+function _fractionDisplayFormat (tag, nodeId) {
   try {
     let edgentConfig = JSON.parse(constant.edgentConfig);
-    if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
-      let fractionVal = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].FDF;
+    if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
+      let fractionVal = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].FDF;
       if (fractionVal) {
         if (typeof (tag.value) !== 'object') {
           return Math.floor(tag.value * Math.pow(10, fractionVal)) / Math.pow(10, fractionVal);
@@ -114,10 +114,10 @@ function _fractionDisplayFormat (tag, scadaId) {
     throw Error(err);
   }
 }
-function _checkTypeOfTagValue (tag, scadaId) {
+function _checkTypeOfTagValue (tag, nodeId) {
   let edgentConfig = JSON.parse(constant.edgentConfig);
-  if (edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName]) {
-    let type = edgentConfig.Scada[scadaId].Device[tag.deviceId].Tag[tag.tagName].Type;
+  if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
+    let type = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].Type;
     switch (type) {
       case 1:
         if (typeof (tag.value) !== 'object') {

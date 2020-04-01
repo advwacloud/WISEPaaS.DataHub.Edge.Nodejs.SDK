@@ -4,10 +4,10 @@ const { connectType, edgeType, protocol } = require('../../common/enum');
 class EdgeAgentOptions {
   constructor (options) {
     assert(options, 'No options to init EdgeAgent.');
-    assert(options.scadaId, 'Scada ID is required.');
+    assert(options.nodeId, 'Node ID is required.');
     this.autoReconnect = options.autoReconnect ? options.autoReconnect : false;
     this.reconnectInterval = options.reconnectInterval ? options.reconnectInterval : 1000;
-    this.scadaId = options.scadaId ? options.scadaId : '';
+    this.nodeId = options.nodeId ? options.nodeId : '';
     this.deviceId = options.deviceId ? options.deviceId : '';
     this.type = options.type && options.type <= Object.keys(edgeType).length ? options.type : edgeType.Gateway;
     this.heartbeat = options.heartbeat ? options.heartbeat : 60000;

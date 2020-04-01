@@ -1,11 +1,11 @@
 'use strict';
 class EdgeConfig {
   constructor () {
-    this.scada = new ScadaConfig();
+    this.node = new NodeConfig();
     return this;
   }
 }
-class ScadaConfig {
+class NodeConfig {
   constructor () {
     this.name = '';
     this.description = '';
@@ -76,7 +76,7 @@ class TextTagConfig extends TagConfig {
 }
 module.exports = {
   EdgeConfig,
-  ScadaConfig,
+  NodeConfig,
   DeviceConfig,
   AnalogTagConfig,
   DiscreteTagConfig,

@@ -1,6 +1,6 @@
 'use strict';
 const { BaseMessage } = require('./BaseMessage');
-const { actionType, SCADAConfigType, TagType } = require('../../common/enum');
+const { actionType, NODEConfigType, TagType } = require('../../common/enum');
 class DObject {
   constructor () {
     this.Action = actionType.create;
@@ -15,15 +15,15 @@ class ConfigMessage extends BaseMessage {
     return this;
   }
 }
-class ScadaObject {
-  constructor (scadaId, scadaConfig, heartBeat) {
-    this.Id = scadaId;
-    this.Name = scadaConfig.scada.name;
-    if (scadaConfig.scada.description) {
-      this.Desc = scadaConfig.scada.description;
+class NodeObject {
+  constructor (nodeId, nodeConfig, heartBeat) {
+    this.Id = nodeId;
+    this.Name = nodeConfig.node.name;
+    if (nodeConfig.node.description) {
+      this.Desc = nodeConfig.node.description;
     }
     this.Hbt = heartBeat / 1000;
-    this.Type = SCADAConfigType.SCADA;// 這是固定的?
+    this.Type = NODEConfigType.NODE;// 這是固定的?
     this.Device = {};
     return this;
   }
@@ -87,7 +87,7 @@ class TextTagObject extends TagObject {
 }
 module.exports = {
   ConfigMessage,
-  ScadaObject,
+  NodeObject,
   DeviceObject,
   AnalogTagObject,
   DiscreteTagObject,
