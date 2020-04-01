@@ -22,18 +22,6 @@ class ScadaObject {
     if (scadaConfig.scada.description) {
       this.Desc = scadaConfig.scada.description;
     }
-    if (scadaConfig.scada.primaryIP) {
-      this.PIP = scadaConfig.scada.primaryIP;
-    }
-    if (scadaConfig.scada.backupIP) {
-      this.BIP = scadaConfig.scada.backupIP;
-    }
-    if (scadaConfig.scada.primaryPort) {
-      this.PPort = scadaConfig.scada.primaryPort;
-    }
-    if (scadaConfig.scada.backupPort) {
-      this.BPort = scadaConfig.scada.backupPort;
-    }
     this.Hbt = heartBeat / 1000;
     this.Type = SCADAConfigType.SCADA;// 這是固定的?
     this.Device = {};
@@ -46,15 +34,6 @@ class DeviceObject {
     this.Type = deviceConfig.type;
     if (deviceConfig.description) {
       this.Desc = deviceConfig.description;
-    }
-    if (deviceConfig.IP) {
-      this.IP = deviceConfig.IP;
-    }
-    if (deviceConfig.port) {
-      this.Port = deviceConfig.port;
-    }
-    if (deviceConfig.portNumber) {
-      this.PNbr = deviceConfig.portNumber;
     }
     if (deviceConfig.rp) {
       this.RP = deviceConfig.rp;
