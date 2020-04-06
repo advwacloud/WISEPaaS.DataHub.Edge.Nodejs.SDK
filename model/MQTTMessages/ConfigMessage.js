@@ -1,6 +1,6 @@
 'use strict';
 const { BaseMessage } = require('./BaseMessage');
-const { actionType, NODEConfigType, TagType } = require('../../common/enum');
+const { actionType, nodeConfigType, tagType } = require('../../common/enum');
 class DObject {
   constructor () {
     this.Action = actionType.create;
@@ -23,7 +23,7 @@ class NodeObject {
       this.Desc = nodeConfig.node.description;
     }
     this.Hbt = heartBeat / 1000;
-    this.Type = NODEConfigType.NODE;// 這是固定的?
+    this.Type = nodeConfigType.node;// 這是固定的?
     this.Device = {};
     return this;
   }
@@ -35,8 +35,8 @@ class DeviceObject {
     if (deviceConfig.description) {
       this.Desc = deviceConfig.description;
     }
-    if (deviceConfig.rp) {
-      this.RP = deviceConfig.rp;
+    if (deviceConfig.retentionPolicyName) {
+      this.RP = deviceConfig.retentionPolicyName;
     }
     this.Tag = {};
     return this;
@@ -52,7 +52,7 @@ class TagObject {
 }
 class AnalogTagObject extends TagObject {
   constructor (analogConfig) {
-    super(TagType.Analog, analogConfig);
+    super(tagType.Analog, analogConfig);
     this.SH = analogConfig && analogConfig.spanHigh ? analogConfig.spanHigh : 1000;
     this.SL = analogConfig && analogConfig.spanLow ? analogConfig.spanLow : 0;
     this.EU = analogConfig && analogConfig.engineerUnit ? analogConfig.engineerUnit : '';
@@ -66,7 +66,7 @@ class AnalogTagObject extends TagObject {
 }
 class DiscreteTagObject extends TagObject {
   constructor (discreteConfig) {
-    super(TagType.Discrete, discreteConfig);
+    super(tagType.Discrete, discreteConfig);
     this.S0 = discreteConfig && discreteConfig.state0 ? discreteConfig.state0 : 'NotUsed';
     this.S1 = discreteConfig && discreteConfig.state1 ? discreteConfig.state1 : 'NotUsed';
     this.S2 = discreteConfig && discreteConfig.state2 ? discreteConfig.state2 : 'NotUsed';
@@ -80,7 +80,7 @@ class DiscreteTagObject extends TagObject {
 }
 class TextTagObject extends TagObject {
   constructor (textConfig) {
-    super(TagType.Text, textConfig);
+    super(tagType.Text, textConfig);
 
     return this;
   }

@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-
+## UnRelease
+### Added
+- open vpn for linux
+### Update
+- 將scada相關字改為node
 ## [1.0.2] - 2020-03-05
 ### Added
 - sendData 針對 tag value 增加 type 檢查機制

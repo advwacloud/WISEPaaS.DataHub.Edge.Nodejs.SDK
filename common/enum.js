@@ -17,12 +17,12 @@ module.exports = {
     update: 2,
     delete: 3
   },
-  NODEConfigType: {
-    NODE: 1,
+  nodeConfigType: {
+    node: 1,
     gateway: 2,
     virtualGroup: 3
   },
-  TagType: {
+  tagType: {
     Analog: 1,
     Discrete: 2,
     Text: 3
@@ -31,7 +31,7 @@ module.exports = {
     Offline: 0,
     Online: 1
   },
-  MessageType: {
+  messageType: {
     WriteValue: 0,
     WriteConfig: 1,
     TimeSync: 2,

@@ -19,7 +19,7 @@ class DeviceConfig {
     this.name = '';
     this.type = '';
     this.description = '';
-    this.rp = '';
+    this.retentionPolicyName = '';
     this.analogTagList = [];
     this.discreteTagList = [];
     this.textTagList = [];
