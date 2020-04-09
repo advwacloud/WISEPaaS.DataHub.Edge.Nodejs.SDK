@@ -9,9 +9,6 @@ const converter = require('./common/converter');
 const constant = require('./common/const');
 const { HeartBeatMessage } = require('./model/MQTTMessages/HeartBeatMessage');
 const { ConnectMessage } = require('./model/MQTTMessages/ConnectMessage');
-const edgeConfig = require('./model/edge/EdgeConfig');
-const { EdgeData, Tag } = require('./model/edge/EdgeData');
-const { EdgeDeviceStatus, DeviceStatus } = require('./model/edge/EdgeDeviceStatus');
 const { DisconnectMessage } = require('./model/MQTTMessages/DisconnectMessage');
 const { WriteValueCommand } = require('./model/edge/WriteValueCommand');
 class EdgeAgent {
@@ -315,17 +312,6 @@ function _checkConfigIdentical (message) {
 //   const showtime = string + ' ' + time.getSeconds() + ':' + time.getMilliseconds();
 //   console.log(showtime);
 // }
-
-EdgeAgent.EdgeConfig = edgeConfig.EdgeConfig;
-EdgeAgent.NodeConfig = edgeConfig.NodeConfig;
-EdgeAgent.DeviceConfig = edgeConfig.DeviceConfig;
-EdgeAgent.AnalogTagConfig = edgeConfig.AnalogTagConfig;
-EdgeAgent.DiscreteTagConfig = edgeConfig.DiscreteTagConfig;
-EdgeAgent.TextTagConfig = edgeConfig.TextTagConfig;
-EdgeAgent.EdgeData = EdgeData;
-EdgeAgent.Tag = Tag;
-EdgeAgent.EdgeDeviceStatus = EdgeDeviceStatus;
-EdgeAgent.DeviceStatus = DeviceStatus;
 
 module.exports = {
   EdgeAgent

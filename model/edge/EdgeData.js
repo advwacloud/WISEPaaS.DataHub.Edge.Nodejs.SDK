@@ -1,5 +1,5 @@
 'use strict';
-class Tag {
+class EdgeDataTag {
   constructor () {
     this.deviceId = '';
     this.tagName = '';
@@ -16,5 +16,5 @@ class EdgeData {
 }
 module.exports = {
   EdgeData,
-  Tag
+  EdgeDataTag
 };
