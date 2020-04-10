@@ -134,15 +134,33 @@ function _checkTypeOfTagValue (tag, nodeId) {
         break;
       case 2:
         let RegExp = /^\d+$/;
-        let res = RegExp.test(tag.value);
-        if (!res) {
-          throw Error('Tag Name: ' + tag.tagName + '. Type of value is not positive integer.');
+        if (typeof (tag.value) !== 'object') {
+          let res = RegExp.test(tag.value);
+          if (!res) {
+            throw Error('Tag Name: ' + tag.tagName + '. Type of value is not positive integer.');
+          }
+        } else {
+          for (let key in tag.value) {
+            if (!RegExp.test(tag.value[key])) {
+              throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not positive integer.');
+            }
+          }
         }
+
         break;
       case 3:
-        if (typeof (tag.value) !== 'string') {
-          throw Error('Tag Name: ' + tag.tagName + '. Type of value is not string.');
+        if (typeof (tag.value) !== 'object') {
+          if (typeof (tag.value) !== 'string') {
+            throw Error('Tag Name: ' + tag.tagName + '. Type of value is not string.');
+          }
+        } else {
+          for (let key in tag.value) {
+            if (typeof (tag.value[key]) !== 'string') {
+              throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not string');
+            }
+          }
         }
+
         break;
     }
   }
