@@ -9,32 +9,32 @@ const constant = require('./const');
 
 function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
   try {
-    const msg = new configMessage.ConfigMessage();
+    let msg = new configMessage.ConfigMessage();
     msg.d.Action = action;
-    const nodeObj = new configMessage.NodeObject(nodeId, edgeConfig, heartBeat);
+    let nodeObj = new configMessage.NodeObject(nodeId, edgeConfig, heartBeat);
     for (var device of edgeConfig.node.deviceList) {
       assert(device.id, 'Device Id is required, please check the edge config properties.');
       assert(device.name, 'Device name is required, please check the edge config properties.');
       assert(device.type, 'Device type is required, please check the edge config properties.');
-      const deviceObj = new configMessage.DeviceObject(device);
+      let deviceObj = new configMessage.DeviceObject(device);
       if (device.analogTagList && device.analogTagList.length !== 0) {
-        for (const anaTag of device.analogTagList) {
+        for (let anaTag of device.analogTagList) {
           assert(anaTag.name, 'Analog tag name is required, please check the edge config properties.');
-          const analogTagObj = new configMessage.AnalogTagObject(anaTag);
+          let analogTagObj = new configMessage.AnalogTagObject(anaTag);
           deviceObj.Tag[anaTag.name] = analogTagObj;
         }
       }
       if (device.discreteTagList && device.discreteTagList.length !== 0) {
-        for (const disTag of device.discreteTagList) {
+        for (let disTag of device.discreteTagList) {
           assert(disTag.name, 'Discrete tag name is required, please check the edge config properties.');
-          const disTagObj = new configMessage.DiscreteTagObject(disTag);
+          let disTagObj = new configMessage.DiscreteTagObject(disTag);
           deviceObj.Tag[disTag.name] = disTagObj;
         }
       }
       if (device.textTagList && device.textTagList.length !== 0) {
-        for (const textTag of device.textTagList) {
+        for (let textTag of device.textTagList) {
           assert(textTag.name, 'Text tag name is required, please check the edge config properties.');
-          const textTagObj = new configMessage.TextTagObject(textTag);
+          let textTagObj = new configMessage.TextTagObject(textTag);
           deviceObj.Tag[textTag.name] = textTagObj;
         }
       }
@@ -49,11 +49,11 @@ function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
   }
 }
 function _convertData (data, nodeId) {
-  const result = [];
+  let result = [];
   let msg = new DataMessage();
   let count = 0;
   for (let i = 0; i < data.tagList.length; i++) {
-    const tag = data.tagList[i];
+    let tag = data.tagList[i];
     assert(tag.deviceId, 'Device ID is required when call the sendData function.');
     assert(tag.tagName, 'Tag name is required when call the sendData function.');
     if (!msg.d[tag.deviceId]) {
@@ -80,9 +80,9 @@ function _convertDeviceStatus (deviceStatus) {
     if (Object.keys(deviceStatus).length === 0) {
       return;
     }
-    const msg = new DeviceStatusMessage();
+    let msg = new DeviceStatusMessage();
     msg.ts = deviceStatus.ts;
-    for (const device of deviceStatus.deviceList) {
+    for (let device of deviceStatus.deviceList) {
       assert(device.id, 'Device ID is required when call the updateDeviceStatus function.');
       msg.d.Dev[device.id] = device.status;
     }

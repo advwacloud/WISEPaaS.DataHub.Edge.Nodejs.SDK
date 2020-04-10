@@ -19,16 +19,16 @@ function _connectMQTTorDCCS () {
           retain: true
         };
         this._options.MQTT.reconnectPeriod = this._options.reconnectInterval;
-        const client = mqtt.connect(this._options.MQTT);
+        let client = mqtt.connect(this._options.MQTT);
         resolve(client);
       } else {
-        const reqOpt = {
+        let reqOpt = {
           uri: this._options.DCCS.APIUrl + 'v1/serviceCredentials/' + this._options.DCCS.credentialKey,
           json: true
         };
         request.get(reqOpt).then(res => {
-          const credential = res.credential;
-          const mqttOptions = {
+          let credential = res.credential;
+          let mqttOptions = {
             host: res.serviceHost
           };
           if (this._options.useSecure) {
@@ -48,7 +48,7 @@ function _connectMQTTorDCCS () {
           };
 
           mqttOptions.reconnectPeriod = this._options.reconnectInterval;
-          const client = mqtt.connect(mqttOptions);
+          let client = mqtt.connect(mqttOptions);
           resolve(client);
         });
       }

@@ -73,8 +73,8 @@ class EdgeAgent {
           reject(err);
           return callback(err, result);
         }
-        const msg = new DisconnectMessage();
-        const topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
+        let msg = new DisconnectMessage();
+        let topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
         this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true }, closeMQTTClient.bind(this, this.disconnected));
         clearInterval(this._heartBeatInterval);
         callback(null, result);
@@ -143,11 +143,11 @@ class EdgeAgent {
           reject(err);
           return callback(err, result);
         }
-        const msgArray = converter.convertData(data, this._options.nodeId);
+        let msgArray = converter.convertData(data, this._options.nodeId);
         if (this._client.connected === false) {
           dataRecoverHelper.write(msgArray);
         } else {
-          for (const msg of msgArray) {
+          for (let msg of msgArray) {
             this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 }, (error) => {
               if (error) {
                 dataRecoverHelper.write(msg);
@@ -174,7 +174,7 @@ class EdgeAgent {
     callback = callback || function () { };
     return new Promise((resolve, reject) => {
       try {
-        const msg = converter.convertDeviceStatus(devieStatus);
+        let msg = converter.convertDeviceStatus(devieStatus);
         this._client.publish(this._mqttTopic._nodeConnTopic, JSON.stringify(msg), { qos: 1, retain: true });
         resolve(true);
         callback(null, result);
@@ -222,8 +222,8 @@ function _mqttDisconnected () {
 }
 function _mqttMessageReceived (topic, message, packet) {
   try {
-    const msg = JSON.parse(message.toString());
-    const result = {};
+    let msg = JSON.parse(message.toString());
+    let result = {};
     let resMsg = {};
     if (!msg || !msg.d) {
       return;
@@ -232,12 +232,12 @@ function _mqttMessageReceived (topic, message, packet) {
       switch (msg.d.Cmd) {
         case 'WV':
           resMsg = new WriteValueCommand();
-          for (const devObj in msg.d.Val) {
-            const device = new WriteValueCommand.Device();
+          for (let devObj in msg.d.Val) {
+            let device = new WriteValueCommand.Device();
             // console.log(devObj);
             device.id = devObj;
-            for (const tagObj in msg.d.Val[devObj]) {
-              const tag = new WriteValueCommand.Tag();
+            for (let tagObj in msg.d.Val[devObj]) {
+              let tag = new WriteValueCommand.Tag();
               tag.name = tagObj;
               tag.value = msg.d.Val[devObj][tagObj];
               device.tagList.push(tag);
@@ -270,7 +270,7 @@ function dataRecoverMessage () {
   dataRecoverHelper.dataAvailable((res) => {
     if (res) {
       dataRecoverHelper.read(constant.DEAFAULT_DATARECOVER_COUNT, (message) => {
-        for (const msg of message) {
+        for (let msg of message) {
           this._client.publish(this._mqttTopic._dataTopic, msg, { qos: 1 });
         }
       });
@@ -278,13 +278,13 @@ function dataRecoverMessage () {
   });
 }
 function sendHeartBeatMessage () {
-  const msg = new HeartBeatMessage();
-  const topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
+  let msg = new HeartBeatMessage();
+  let topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
   this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true });
 }
 function sendConnectMessage () {
-  const msg = new ConnectMessage();
-  const topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
+  let msg = new ConnectMessage();
+  let topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
   this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true });
 }
 function closeMQTTClient () {

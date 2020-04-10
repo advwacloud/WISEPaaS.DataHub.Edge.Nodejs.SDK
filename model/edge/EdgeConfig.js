@@ -55,12 +55,12 @@ class DiscreteTagConfig extends TagConfig {
     this.arraySize = 0;
     this.state0 = '0';
     this.state1 = '1';
-    this.state2 = 'NotUsed';
-    this.state3 = 'NotUsed';
-    this.state4 = 'NotUsed';
-    this.state5 = 'NotUsed';
-    this.state6 = 'NotUsed';
-    this.state7 = 'NotUsed';
+    this.state2 = '';
+    this.state3 = '';
+    this.state4 = '';
+    this.state5 = '';
+    this.state6 = '';
+    this.state7 = '';
     return this;
   }
 }

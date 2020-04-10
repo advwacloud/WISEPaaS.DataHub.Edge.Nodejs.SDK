@@ -46,7 +46,7 @@ function _dataAvailable (callback) {
       callback(result);
     });
   } catch (error) {
-    const result = false;
+    let result = false;
     callback(result);
     console.error('dataAvailable function error: ' + error);
   }
@@ -58,14 +58,14 @@ function _read (count, callback) {
         console.error(error);
         throw error;
       }
-      const idList = [];
-      const messageList = [];
-      const resMsg = [];
+      let idList = [];
+      let messageList = [];
+      let resMsg = [];
       row.forEach(x => {
         idList.push(x.id);
         messageList.push(x.message);
       });
-      for (const msg of messageList) {
+      for (let msg of messageList) {
         resMsg.push(decompressFromBase64String(msg));
       }
       if (idList.length > 0) {
@@ -73,7 +73,6 @@ function _read (count, callback) {
           if (error) console.log(error);
         });
       }
-      // const msg = decompressFromBase64String(row.message);
       callback(resMsg);
     });
   } catch (error) {
@@ -92,7 +91,7 @@ function _write (message) {
           }
         });
         if (Array.isArray(message)) {
-          for (const msg of message) {
+          for (let msg of message) {
             _writeMsgToDB(msg);
           }
         } else {
@@ -121,7 +120,7 @@ function queryString (idList) {
   return res;
 }
 function _writeMsgToDB (msg) {
-  const result = compressToBase64String(msg);
+  let result = compressToBase64String(msg);
   _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
     if (error) {
       console.error('Insert data to database error: ' + error);

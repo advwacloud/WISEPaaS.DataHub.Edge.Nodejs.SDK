@@ -5,10 +5,10 @@ function compressToBase64String (message) {
     if (JSON.stringify(message) === '' || Object.keys(message).length === 0) {
       return '';
     }
-    const rawData = Buffer.from(JSON.stringify(message));
+    let rawData = Buffer.from(JSON.stringify(message));
     // console.log(rawData);
-    const zippedData = zlib.gzipSync(rawData);
-    const res = Buffer.from(zippedData).toString('base64');
+    let zippedData = zlib.gzipSync(rawData);
+    let res = Buffer.from(zippedData).toString('base64');
     return res;
   } catch (error) {
     console.error('compress to base64 to string error: ' + error);
@@ -16,9 +16,9 @@ function compressToBase64String (message) {
 }
 function decompressFromBase64String (message) {
   try {
-    const buff = Buffer.from(message, 'base64');
-    const zippedData = zlib.unzipSync(buff);
-    const res = zippedData.toString();
+    let buff = Buffer.from(message, 'base64');
+    let zippedData = zlib.unzipSync(buff);
+    let res = zippedData.toString();
     return res;
   } catch (error) {
     console.error('decompress from base64 to string error: ' + error);

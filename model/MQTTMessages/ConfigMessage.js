@@ -67,14 +67,14 @@ class AnalogTagObject extends TagObject {
 class DiscreteTagObject extends TagObject {
   constructor (discreteConfig) {
     super(tagType.Discrete, discreteConfig);
-    this.S0 = discreteConfig && discreteConfig.state0 ? discreteConfig.state0 : 'NotUsed';
-    this.S1 = discreteConfig && discreteConfig.state1 ? discreteConfig.state1 : 'NotUsed';
-    this.S2 = discreteConfig && discreteConfig.state2 ? discreteConfig.state2 : 'NotUsed';
-    this.S3 = discreteConfig && discreteConfig.state3 ? discreteConfig.state3 : 'NotUsed';
-    this.S4 = discreteConfig && discreteConfig.state4 ? discreteConfig.state4 : 'NotUsed';
-    this.S5 = discreteConfig && discreteConfig.state5 ? discreteConfig.state5 : 'NotUsed';
-    this.S6 = discreteConfig && discreteConfig.state6 ? discreteConfig.state6 : 'NotUsed';
-    this.S7 = discreteConfig && discreteConfig.state7 ? discreteConfig.state7 : 'NotUsed';
+    if (discreteConfig && discreteConfig.state0 !== '') this.S0 = discreteConfig.state0;
+    if (discreteConfig && discreteConfig.state1 !== '') this.S1 = discreteConfig.state1;
+    if (discreteConfig && discreteConfig.state2 !== '') this.S2 = discreteConfig.state2;
+    if (discreteConfig && discreteConfig.state3 !== '') this.S3 = discreteConfig.state3;
+    if (discreteConfig && discreteConfig.state4 !== '') this.S4 = discreteConfig.state4;
+    if (discreteConfig && discreteConfig.state5 !== '') this.S5 = discreteConfig.state5;
+    if (discreteConfig && discreteConfig.state6 !== '') this.S6 = discreteConfig.state6;
+    if (discreteConfig && discreteConfig.state7 !== '') this.S7 = discreteConfig.state7;
     return this;
   }
 }
