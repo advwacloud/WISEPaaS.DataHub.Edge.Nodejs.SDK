@@ -1,17 +1,17 @@
 'use strict';
 const mqtt = require('mqtt');
 const request = require('request-promise');
-const { LastWillMessage } = require('../model/MQTTMessages/LastWillMessage');
-const { connectType } = require('../common/enum');
+const edgeEnum = require('../common/enum');
 const Const = require('../common/const');
 const exec = require('child_process').exec;
 const os = require('os');
+const LastWillMessage = require('../model/MQTTMessages/LastWillMessage');
 
 function _connectMQTTorDCCS () {
   return new Promise((resolve, reject) => {
     try {
       _openvpnConnect.call(this);
-      if (this._options.connectType === connectType.MQTT) {
+      if (this._options.connectType === edgeEnum.connectType.MQTT) {
         this._options.MQTT.will = {
           topic: `/wisepaas/scada/${this._options.nodeId}/conn`,
           payload: JSON.stringify(new LastWillMessage()),
@@ -79,5 +79,5 @@ function _openvpnConnect () {
 }
 
 module.exports = {
-  _connectMQTTorDCCS
+  connectMQTTorDCCS: _connectMQTTorDCCS
 };

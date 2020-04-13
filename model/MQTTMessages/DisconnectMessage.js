@@ -1,5 +1,6 @@
 'use strict';
-const { BaseMessage } = require('./BaseMessage');
+const BaseMessage = require('./BaseMessage');
+
 class DObject {
   constructor () {
     this.dsc = 1;
@@ -8,6 +9,7 @@ class DObject {
     };
   }
 }
+
 class DisconnectMessage extends BaseMessage {
   constructor () {
     super();
@@ -15,6 +17,5 @@ class DisconnectMessage extends BaseMessage {
     return this;
   }
 }
-module.exports = {
-  DisconnectMessage
-};
+
+module.exports = DisconnectMessage;

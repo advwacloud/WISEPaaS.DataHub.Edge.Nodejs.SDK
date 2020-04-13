@@ -1,18 +1,19 @@
 'use strict';
 const events = require('events').EventEmitter;
 const fs = require('fs');
-const { EdgeAgentOptions } = require('./model/edge/EdgeAgentOptions');
+const EdgeAgentOptions = require('./model/edge/EdgeAgentOptions');
 const edgeEnum = require('./common/enum');
 const connHelper = require('./helpers/connectHelper');
 const dataRecoverHelper = require('./helpers/dataRecoverHelper');
 const converter = require('./common/converter');
 const constant = require('./common/const');
-const { HeartBeatMessage } = require('./model/MQTTMessages/HeartBeatMessage');
-const { ConnectMessage } = require('./model/MQTTMessages/ConnectMessage');
-const { DisconnectMessage } = require('./model/MQTTMessages/DisconnectMessage');
-const { WriteValueCommand } = require('./model/edge/WriteValueCommand');
+const HeartBeatMessage = require('./model/MQTTMessages/HeartBeatMessage');
+const ConnectMessage = require('./model/MQTTMessages/ConnectMessage');
+const DisconnectMessage = require('./model/MQTTMessages/DisconnectMessage');
+const writeValCmd = require('./model/edge/WriteValueCommand');
 class EdgeAgent {
   constructor (options) {
+    // this._options = new EdgeOptions.EdgeAgentOptions(options);
     this._options = new EdgeAgentOptions(options);
     this._client = {};
     this._heartBeatInterval = {};
@@ -44,9 +45,9 @@ class EdgeAgent {
           reject(err);
           return callback(err, result);
         }
-        connHelper._connectMQTTorDCCS.call(this).then((client) => {
+        connHelper.connectMQTTorDCCS.call(this).then((client) => {
           this._client = client;
-          initEventFunction.call(this);
+          _initEventFunction.call(this);
           callback(null, result);
           resolve(true);
         }, error => {
@@ -75,7 +76,7 @@ class EdgeAgent {
         }
         let msg = new DisconnectMessage();
         let topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
-        this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true }, closeMQTTClient.bind(this, this.disconnected));
+        this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true }, _closeMQTTClient.bind(this, this.disconnected));
         clearInterval(this._heartBeatInterval);
         callback(null, result);
         resolve(result);
@@ -187,23 +188,25 @@ class EdgeAgent {
     });
   }
 }
-function initEventFunction () {
+
+function _initEventFunction () {
   this._client.on('connect', _mqttConnected.bind(this));
   this._client.on('close', _mqttDisconnected.bind(this));
   this._client.on('message', (topic, message, packet) => {
     _mqttMessageReceived.call(this, topic, message, packet);
   });
 }
-function _mqttConnected (customerCallback) {
+
+function _mqttConnected () {
   try {
     this.events.emit('connected');
-    sendConnectMessage.call(this);
+    _sendConnectMessage.call(this);
     if (this._options.heartbeat > 0) {
-      this._heartBeatInterval = setInterval(sendHeartBeatMessage.bind(this), this._options.heartbeat);
+      this._heartBeatInterval = setInterval(_sendHeartBeatMessage.bind(this), this._options.heartbeat);
     }
     if (this._options.dataRecover) {
       dataRecoverHelper.init();
-      this._dataRecoverInteval = setInterval(dataRecoverMessage.bind(this), constant.DEAFAULT_DATARECOVER_INTERVAL);
+      this._dataRecoverInteval = setInterval(_dataRecoverMessage.bind(this), constant.DEAFAULT_DATARECOVER_INTERVAL);
     }
     this._client.subscribe(this._mqttTopic._cmdTopic);
     this._client.subscribe(this._mqttTopic._ackTopic);
@@ -211,6 +214,7 @@ function _mqttConnected (customerCallback) {
     console.error('_mqttConnected function error: ' + error);
   }
 }
+
 function _mqttDisconnected () {
   try {
     this.events.emit('disconnected');
@@ -220,6 +224,7 @@ function _mqttDisconnected () {
     console.error('_mqttDisconnected function error: ' + error);
   }
 }
+
 function _mqttMessageReceived (topic, message, packet) {
   try {
     let msg = JSON.parse(message.toString());
@@ -231,13 +236,13 @@ function _mqttMessageReceived (topic, message, packet) {
     if (msg.d.Cmd !== undefined) {
       switch (msg.d.Cmd) {
         case 'WV':
-          resMsg = new WriteValueCommand();
+          resMsg = new writeValCmd.WriteValueCommand();
           for (let devObj in msg.d.Val) {
-            let device = new WriteValueCommand.Device();
+            let device = new writeValCmd.Device();
             // console.log(devObj);
             device.id = devObj;
             for (let tagObj in msg.d.Val[devObj]) {
-              let tag = new WriteValueCommand.Tag();
+              let tag = new writeValCmd.Tag();
               tag.name = tagObj;
               tag.value = msg.d.Val[devObj][tagObj];
               device.tagList.push(tag);
@@ -263,7 +268,8 @@ function _mqttMessageReceived (topic, message, packet) {
     console.log('_mqttMessageReceived function error: ' + error);
   }
 }
-function dataRecoverMessage () {
+
+function _dataRecoverMessage () {
   if (this._client.connected === false) {
     return;
   }
@@ -277,19 +283,23 @@ function dataRecoverMessage () {
     }
   });
 }
-function sendHeartBeatMessage () {
+
+function _sendHeartBeatMessage () {
   let msg = new HeartBeatMessage();
   let topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
   this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true });
 }
-function sendConnectMessage () {
+
+function _sendConnectMessage () {
   let msg = new ConnectMessage();
   let topic = this._options.type === edgeEnum.edgeType.Gateway ? this._mqttTopic._nodeConnTopic : this._mqttTopic._deviceConnTopic;
   this._client.publish(topic, JSON.stringify(msg), { qos: 1, retain: true });
 }
-function closeMQTTClient () {
+
+function _closeMQTTClient () {
   this._client.end(true, []);
 }
+
 function _checkConfigIdentical (message) {
   constant.edgentConfig = JSON.stringify(message.d);
   if (!fs.existsSync(constant.configFilePath)) {
@@ -313,6 +323,4 @@ function _checkConfigIdentical (message) {
 //   console.log(showtime);
 // }
 
-module.exports = {
-  EdgeAgent
-};
+module.exports = EdgeAgent;

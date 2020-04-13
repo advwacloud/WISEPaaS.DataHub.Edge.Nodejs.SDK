@@ -3,8 +3,8 @@
 const assert = require('assert');
 const fs = require('fs');
 const configMessage = require('../model/MQTTMessages/ConfigMessage');
-const { DataMessage } = require('../model/MQTTMessages/DataMessage');
-const { DeviceStatusMessage } = require('../model/MQTTMessages/DeviceStatusMessage');
+const DataMessage = require('../model/MQTTMessages/DataMessage');
+const DeviceStatusMessage = require('../model/MQTTMessages/DeviceStatusMessage');
 const constant = require('./const');
 
 function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
@@ -48,6 +48,7 @@ function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
     throw Error('Convert edge config to MQTT format error! error message: ' + error);
   }
 }
+
 function _convertData (data, nodeId) {
   let result = [];
   let msg = new DataMessage();
@@ -75,6 +76,7 @@ function _convertData (data, nodeId) {
   }
   return result;
 }
+
 function _convertDeviceStatus (deviceStatus) {
   try {
     if (Object.keys(deviceStatus).length === 0) {
@@ -91,6 +93,7 @@ function _convertDeviceStatus (deviceStatus) {
     console.log('error occured in convertDeviceStatus function, error: ' + error);
   }
 }
+
 function _fractionDisplayFormat (tag, nodeId) {
   try {
     let edgentConfig = JSON.parse(constant.edgentConfig);
@@ -114,6 +117,7 @@ function _fractionDisplayFormat (tag, nodeId) {
     throw Error(err);
   }
 }
+
 function _checkTypeOfTagValue (tag, nodeId) {
   let edgentConfig = JSON.parse(constant.edgentConfig);
   if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
@@ -160,11 +164,11 @@ function _checkTypeOfTagValue (tag, nodeId) {
             }
           }
         }
-
         break;
     }
   }
 }
+
 module.exports = {
   convertWholeConfig: _convertWholeConfig,
   convertData: _convertData,

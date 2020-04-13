@@ -7,6 +7,7 @@ class EdgeDataTag {
     return this;
   }
 }
+
 class EdgeData {
   constructor () {
     this.tagList = [];
@@ -14,6 +15,7 @@ class EdgeData {
     return this;
   }
 }
+
 module.exports = {
   EdgeData,
   EdgeDataTag

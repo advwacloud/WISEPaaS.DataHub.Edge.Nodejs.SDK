@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+
 module.exports = {
   DEAFAULT_DATARECOVER_INTERVAL: 3000,
   DEAFAULT_DATARECOVER_COUNT: 10,
@@ -7,5 +8,6 @@ module.exports = {
   edgentConfig: '',
   win32: 'win32',
   linux: 'linux',
-  macOS: 'darwin'
+  macOS: 'darwin',
+  base64: 'base64'
 };

@@ -6,6 +6,4 @@ class TimeSyncCommand {
   }
 }
 
-module.exports = {
-  TimeSyncCommand
-};
+module.exports = TimeSyncCommand;

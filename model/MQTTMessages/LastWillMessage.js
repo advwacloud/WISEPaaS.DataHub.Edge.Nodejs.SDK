@@ -1,5 +1,5 @@
 'use strict';
-const { BaseMessage } = require('./BaseMessage');
+const BaseMessage = require('./BaseMessage');
 
 class DObject {
   constructor () {
@@ -16,6 +16,4 @@ class LastWillMessage extends BaseMessage {
   }
 }
 
-module.exports = {
-  LastWillMessage
-};
+module.exports = LastWillMessage;

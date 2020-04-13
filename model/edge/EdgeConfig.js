@@ -5,6 +5,7 @@ class EdgeConfig {
     return this;
   }
 }
+
 class NodeConfig {
   constructor () {
     this.name = '';
@@ -13,6 +14,7 @@ class NodeConfig {
     return this;
   }
 }
+
 class DeviceConfig {
   constructor () {
     this.id = '';
@@ -26,11 +28,13 @@ class DeviceConfig {
     return this;
   }
 }
+
 class TagConfig {
   constructor () {
     this.name = '';
   }
 }
+
 class AnalogTagConfig extends TagConfig {
   constructor () {
     super();
@@ -46,6 +50,7 @@ class AnalogTagConfig extends TagConfig {
     return this;
   }
 }
+
 class DiscreteTagConfig extends TagConfig {
   constructor () {
     super();
@@ -64,6 +69,7 @@ class DiscreteTagConfig extends TagConfig {
     return this;
   }
 }
+
 class TextTagConfig extends TagConfig {
   constructor () {
     super();
@@ -74,6 +80,7 @@ class TextTagConfig extends TagConfig {
     return this;
   }
 }
+
 module.exports = {
   EdgeConfig,
   NodeConfig,

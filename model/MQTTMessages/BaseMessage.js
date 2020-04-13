@@ -5,6 +5,4 @@ class BaseMessage {
   }
 }
 
-module.exports = {
-  BaseMessage
-};
+module.exports = BaseMessage;

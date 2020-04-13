@@ -1,5 +1,6 @@
 'use strict';
-const { BaseMessage } = require('./BaseMessage');
+const BaseMessage = require('./BaseMessage');
+
 class DataMessage extends BaseMessage {
   constructor () {
     super();
@@ -7,6 +8,5 @@ class DataMessage extends BaseMessage {
     return this;
   }
 }
-module.exports = {
-  DataMessage
-};
+
+module.exports = DataMessage;

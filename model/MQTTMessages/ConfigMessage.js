@@ -1,13 +1,15 @@
 'use strict';
-const { BaseMessage } = require('./BaseMessage');
-const { actionType, nodeConfigType, tagType } = require('../../common/enum');
+const BaseMessage = require('./BaseMessage');
+const edgeEnum = require('../../common/enum');
+
 class DObject {
   constructor () {
-    this.Action = actionType.create;
+    this.Action = edgeEnum.actionType.create;
     this.Scada = {};
     return this;
   }
 }
+
 class ConfigMessage extends BaseMessage {
   constructor () {
     super();
@@ -15,6 +17,7 @@ class ConfigMessage extends BaseMessage {
     return this;
   }
 }
+
 class NodeObject {
   constructor (nodeId, nodeConfig, heartBeat) {
     this.Id = nodeId;
@@ -23,11 +26,12 @@ class NodeObject {
       this.Desc = nodeConfig.node.description;
     }
     this.Hbt = heartBeat / 1000;
-    this.Type = nodeConfigType.node;// 這是固定的?
+    this.Type = edgeEnum.nodeConfigType.node;// 這是固定的?
     this.Device = {};
     return this;
   }
 }
+
 class DeviceObject {
   constructor (deviceConfig) {
     this.Name = deviceConfig.name;
@@ -42,6 +46,7 @@ class DeviceObject {
     return this;
   }
 }
+
 class TagObject {
   constructor (tagType, tagConfig) {
     this.Type = tagType;
@@ -50,9 +55,10 @@ class TagObject {
     this.Ary = tagConfig && tagConfig.arraySize ? tagConfig.arraySize : 0;
   }
 }
+
 class AnalogTagObject extends TagObject {
   constructor (analogConfig) {
-    super(tagType.Analog, analogConfig);
+    super(edgeEnum.tagType.Analog, analogConfig);
     this.SH = analogConfig && analogConfig.spanHigh ? analogConfig.spanHigh : 1000;
     this.SL = analogConfig && analogConfig.spanLow ? analogConfig.spanLow : 0;
     this.EU = analogConfig && analogConfig.engineerUnit ? analogConfig.engineerUnit : '';
@@ -64,9 +70,10 @@ class AnalogTagObject extends TagObject {
     return this;
   }
 }
+
 class DiscreteTagObject extends TagObject {
   constructor (discreteConfig) {
-    super(tagType.Discrete, discreteConfig);
+    super(edgeEnum.tagType.Discrete, discreteConfig);
     if (discreteConfig && discreteConfig.state0 !== '') this.S0 = discreteConfig.state0;
     if (discreteConfig && discreteConfig.state1 !== '') this.S1 = discreteConfig.state1;
     if (discreteConfig && discreteConfig.state2 !== '') this.S2 = discreteConfig.state2;
@@ -78,13 +85,15 @@ class DiscreteTagObject extends TagObject {
     return this;
   }
 }
+
 class TextTagObject extends TagObject {
   constructor (textConfig) {
-    super(tagType.Text, textConfig);
+    super(edgeEnum.tagType.Text, textConfig);
 
     return this;
   }
 }
+
 module.exports = {
   ConfigMessage,
   NodeObject,

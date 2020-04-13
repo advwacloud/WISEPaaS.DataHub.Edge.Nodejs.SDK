@@ -2,10 +2,11 @@
 const path = require('path');
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
-const { compressToBase64String, decompressFromBase64String } = require('./gZippedJson');
+const gzip = require('./gZippedJson');
 
 const _dbFilePath = path.resolve(process.cwd(), './recover.sqlite.db');
 let _db = null;
+
 function _init () {
   try {
     if (!_db) {
@@ -28,6 +29,7 @@ function _init () {
     console.error('init database function error: ' + error);
   }
 }
+
 function _dataAvailable (callback) {
   try {
     let result = false;
@@ -42,7 +44,6 @@ function _dataAvailable (callback) {
       if (res && res.length > 0) {
         result = true;
       }
-
       callback(result);
     });
   } catch (error) {
@@ -51,6 +52,7 @@ function _dataAvailable (callback) {
     console.error('dataAvailable function error: ' + error);
   }
 }
+
 function _read (count, callback) {
   try {
     _db.all('SELECT * FROM Data LIMIT @Count', count, (error, row) => {
@@ -66,10 +68,10 @@ function _read (count, callback) {
         messageList.push(x.message);
       });
       for (let msg of messageList) {
-        resMsg.push(decompressFromBase64String(msg));
+        resMsg.push(gzip.decompressFromBase64String(msg));
       }
       if (idList.length > 0) {
-        _db.run(`DELETE FROM Data WHERE id IN (${queryString(idList)})`, idList, (error) => {
+        _db.run(`DELETE FROM Data WHERE id IN (${_queryString(idList)})`, idList, (error) => {
           if (error) console.log(error);
         });
       }
@@ -79,6 +81,7 @@ function _read (count, callback) {
     console.error('Data recover read function error: ' + error);
   }
 }
+
 function _write (message) {
   try {
     _db.serialize(() => {
@@ -109,7 +112,7 @@ function _write (message) {
   }
 }
 
-function queryString (idList) {
+function _queryString (idList) {
   let res = '';
   for (let i = 0; i < idList.length; i++) {
     res = res + '?';
@@ -119,8 +122,9 @@ function queryString (idList) {
   }
   return res;
 }
+
 function _writeMsgToDB (msg) {
-  let result = compressToBase64String(msg);
+  let result = gzip.compressToBase64String(msg);
   _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
     if (error) {
       console.error('Insert data to database error: ' + error);

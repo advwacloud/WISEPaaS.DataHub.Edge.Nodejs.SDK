@@ -1,5 +1,6 @@
 'use strict';
-const { BaseMessage } = require('./BaseMessage');
+const BaseMessage = require('./BaseMessage');
+
 class DObject {
   constructor () {
     this.dev = {};
@@ -8,6 +9,7 @@ class DObject {
     };
   }
 }
+
 class DeviceStatusMessage extends BaseMessage {
   constructor () {
     super();
@@ -15,6 +17,5 @@ class DeviceStatusMessage extends BaseMessage {
     return this;
   }
 }
-module.exports = {
-  DeviceStatusMessage
-};
+
+module.exports = DeviceStatusMessage;

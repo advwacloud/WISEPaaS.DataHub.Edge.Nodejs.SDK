@@ -9,6 +9,7 @@ class Device {
     };
   }
 }
+
 class Tag {
   constructor () {
     this.name = '';
@@ -19,6 +20,7 @@ class Tag {
     };
   }
 }
+
 class WriteValueCommand {
   constructor () {
     this.deviceList = [];
@@ -26,8 +28,9 @@ class WriteValueCommand {
     return this;
   }
 }
-WriteValueCommand.Device = Device;
-WriteValueCommand.Tag = Tag;
+
 module.exports = {
-  WriteValueCommand
+  WriteValueCommand,
+  Device,
+  Tag
 };
