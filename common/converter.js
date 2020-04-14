@@ -5,7 +5,8 @@ const fs = require('fs');
 const configMessage = require('../model/MQTTMessages/ConfigMessage');
 const DataMessage = require('../model/MQTTMessages/DataMessage');
 const DeviceStatusMessage = require('../model/MQTTMessages/DeviceStatusMessage');
-const constant = require('./const');
+const Const = require('./const');
+const edgeEnum = require('./enum');
 
 function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
   try {
@@ -60,14 +61,14 @@ function _convertData (data, nodeId) {
     if (!msg.d[tag.deviceId]) {
       msg.d[tag.deviceId] = {};
     }
-    if (fs.existsSync(constant.configFilePath)) {
+    if (fs.existsSync(Const.configFilePath)) {
       _checkTypeOfTagValue(tag, nodeId);
       msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, nodeId);
     } else {
       msg.d[tag.deviceId][tag.tagName] = tag.value;
     }
     count++;
-    if (count === 100 || i === data.tagList.length - 1) {
+    if (count === Const.packageSize || i === data.tagList.length - 1) {
       msg.ts = data.ts;
       result.push(msg);
       msg = new DataMessage();
@@ -96,7 +97,7 @@ function _convertDeviceStatus (deviceStatus) {
 
 function _fractionDisplayFormat (tag, nodeId) {
   try {
-    let edgentConfig = JSON.parse(constant.edgentConfig);
+    let edgentConfig = JSON.parse(Const.edgentConfig);
     if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
       let fractionVal = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].FDF;
       if (fractionVal) {
@@ -119,11 +120,11 @@ function _fractionDisplayFormat (tag, nodeId) {
 }
 
 function _checkTypeOfTagValue (tag, nodeId) {
-  let edgentConfig = JSON.parse(constant.edgentConfig);
+  let edgentConfig = JSON.parse(Const.edgentConfig);
   if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
     let type = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].Type;
     switch (type) {
-      case 1:
+      case edgeEnum.tagType.analog:
         if (typeof (tag.value) !== 'object') {
           if (typeof (tag.value) !== 'number') {
             throw Error('Tag Name: ' + tag.tagName + '. Type of value type is not number');
@@ -136,7 +137,7 @@ function _checkTypeOfTagValue (tag, nodeId) {
           }
         }
         break;
-      case 2:
+      case edgeEnum.tagType.discrete:
         let RegExp = /^\d+$/;
         if (typeof (tag.value) !== 'object') {
           let res = RegExp.test(tag.value);
@@ -150,9 +151,8 @@ function _checkTypeOfTagValue (tag, nodeId) {
             }
           }
         }
-
         break;
-      case 3:
+      case edgeEnum.tagType.text:
         if (typeof (tag.value) !== 'object') {
           if (typeof (tag.value) !== 'string') {
             throw Error('Tag Name: ' + tag.tagName + '. Type of value is not string.');

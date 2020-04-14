@@ -249,7 +249,7 @@ function _mqttMessageReceived (topic, message, packet) {
             }
             resMsg.deviceList.push(device);
           }
-          result.type = edgeEnum.messageType.WriteValue;
+          result.type = edgeEnum.messageType.writeValue;
           result.message = resMsg;
           // messageReceived(result);
           this.events.emit('messageReceived', result);
@@ -260,7 +260,7 @@ function _mqttMessageReceived (topic, message, packet) {
           break;
       }
     } else if (msg.d.Cfg) {
-      result.type = edgeEnum.messageType.ConfigAck;
+      result.type = edgeEnum.messageType.configAck;
       result.message = msg.d.Cfg === 1;
       this.events.emit('messageReceived', result);
     }

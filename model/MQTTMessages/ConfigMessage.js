@@ -58,7 +58,7 @@ class TagObject {
 
 class AnalogTagObject extends TagObject {
   constructor (analogConfig) {
-    super(edgeEnum.tagType.Analog, analogConfig);
+    super(edgeEnum.tagType.analog, analogConfig);
     this.SH = analogConfig && analogConfig.spanHigh ? analogConfig.spanHigh : 1000;
     this.SL = analogConfig && analogConfig.spanLow ? analogConfig.spanLow : 0;
     this.EU = analogConfig && analogConfig.engineerUnit ? analogConfig.engineerUnit : '';
@@ -73,7 +73,7 @@ class AnalogTagObject extends TagObject {
 
 class DiscreteTagObject extends TagObject {
   constructor (discreteConfig) {
-    super(edgeEnum.tagType.Discrete, discreteConfig);
+    super(edgeEnum.tagType.discrete, discreteConfig);
     if (discreteConfig && discreteConfig.state0 !== '') this.S0 = discreteConfig.state0;
     if (discreteConfig && discreteConfig.state1 !== '') this.S1 = discreteConfig.state1;
     if (discreteConfig && discreteConfig.state2 !== '') this.S2 = discreteConfig.state2;
@@ -88,7 +88,7 @@ class DiscreteTagObject extends TagObject {
 
 class TextTagObject extends TagObject {
   constructor (textConfig) {
-    super(edgeEnum.tagType.Text, textConfig);
+    super(edgeEnum.tagType.text, textConfig);
 
     return this;
   }

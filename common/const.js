@@ -9,5 +9,6 @@ module.exports = {
   win32: 'win32',
   linux: 'linux',
   macOS: 'darwin',
-  base64: 'base64'
+  base64: 'base64',
+  packageSize: 100
 };

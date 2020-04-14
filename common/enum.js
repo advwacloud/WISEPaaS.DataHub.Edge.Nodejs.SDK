@@ -23,18 +23,18 @@ module.exports = {
     virtualGroup: 3
   },
   tagType: {
-    Analog: 1,
-    Discrete: 2,
-    Text: 3
+    analog: 1,
+    discrete: 2,
+    text: 3
   },
   status: {
-    Offline: 0,
-    Online: 1
+    offline: 0,
+    online: 1
   },
   messageType: {
-    WriteValue: 0,
-    WriteConfig: 1,
-    TimeSync: 2,
-    ConfigAck: 3
+    writeValue: 0,
+    writeConfig: 1,
+    timeSync: 2,
+    configAck: 3
   }
 };

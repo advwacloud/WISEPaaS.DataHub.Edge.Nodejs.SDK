@@ -55,7 +55,7 @@ class DiscreteTagConfig extends TagConfig {
   constructor () {
     super();
     // this.name = 'DTag';
-    this.description = ' ';
+    this.description = '';
     this.readOnly = false;
     this.arraySize = 0;
     this.state0 = '0';

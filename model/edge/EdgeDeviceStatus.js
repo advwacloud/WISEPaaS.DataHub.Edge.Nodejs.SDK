@@ -3,7 +3,7 @@ const edgeEnum = require('../../common/enum');
 class DeviceStatus {
   constructor () {
     this.id = '';
-    this.status = edgeEnum.status.Offline;
+    this.status = edgeEnum.status.offline;
     return this;
   }
 }
