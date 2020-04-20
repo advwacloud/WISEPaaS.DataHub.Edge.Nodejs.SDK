@@ -47,6 +47,9 @@ class AnalogTagConfig extends TagConfig {
     this.engineerUnit = '';
     this.integerDisplayFormat = 4;
     this.fractionDisplayFormat = 2;
+    this.scalingType = 0;
+    this.scalingFactor1 = 0;
+    this.scalingFactor2 = 0;
     return this;
   }
 }

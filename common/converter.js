@@ -50,6 +50,40 @@ function _convertWholeConfig (action, nodeId, edgeConfig, heartBeat) {
   }
 }
 
+function _convertDeleteConfig (action, nodeId, edgeConfig) {
+  let msg = new configMessage.ConfigMessage();
+  msg.d.Action = action;
+  let nodeObj = new configMessage.NodeObject(nodeId, edgeConfig, null);
+  for (var device of edgeConfig.node.deviceList) {
+    assert(device.id, 'Device Id is required, please check the edge config properties.');
+    let deviceObj = new configMessage.DeviceObject(device);
+    if (device.analogTagList && device.analogTagList.length !== 0) {
+      for (let anaTag of device.analogTagList) {
+        assert(anaTag.name, 'Analog tag name is required, please check the edge config properties.');
+        let analogTagObj = new configMessage.AnalogTagObject(anaTag);
+        deviceObj.Tag[anaTag.name] = analogTagObj;
+      }
+    }
+    if (device.discreteTagList && device.discreteTagList.length !== 0) {
+      for (let disTag of device.discreteTagList) {
+        assert(disTag.name, 'Discrete tag name is required, please check the edge config properties.');
+        let disTagObj = new configMessage.DiscreteTagObject(disTag);
+        deviceObj.Tag[disTag.name] = disTagObj;
+      }
+    }
+    if (device.textTagList && device.textTagList.length !== 0) {
+      for (let textTag of device.textTagList) {
+        assert(textTag.name, 'Text tag name is required, please check the edge config properties.');
+        let textTagObj = new configMessage.TextTagObject(textTag);
+        deviceObj.Tag[textTag.name] = textTagObj;
+      }
+    }
+    nodeObj.Device[device.id] = deviceObj;
+  }
+  msg.d.Scada[nodeId] = nodeObj;
+  return msg;
+}
+
 function _convertData (data, nodeId) {
   let result = [];
   let msg = new DataMessage();
@@ -120,57 +154,62 @@ function _fractionDisplayFormat (tag, nodeId) {
 }
 
 function _checkTypeOfTagValue (tag, nodeId) {
-  let edgentConfig = JSON.parse(Const.edgentConfig);
-  if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
-    let type = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].Type;
-    switch (type) {
-      case edgeEnum.tagType.analog:
-        if (typeof (tag.value) !== 'object') {
-          if (typeof (tag.value) !== 'number') {
-            throw Error('Tag Name: ' + tag.tagName + '. Type of value type is not number');
-          }
-        } else {
-          for (let key in tag.value) {
-            if (typeof (tag.value[key]) !== 'number') {
-              throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not number');
+  try {
+    let edgentConfig = JSON.parse(Const.edgentConfig);
+    if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
+      let type = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].Type;
+      switch (type) {
+        case edgeEnum.tagType.analog:
+          if (typeof (tag.value) !== 'object') {
+            if (typeof (tag.value) !== 'number') {
+              throw Error('Tag Name: ' + tag.tagName + '. Type of value type is not number');
+            }
+          } else {
+            for (let key in tag.value) {
+              if (typeof (tag.value[key]) !== 'number') {
+                throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not number');
+              }
             }
           }
-        }
-        break;
-      case edgeEnum.tagType.discrete:
-        let RegExp = /^\d+$/;
-        if (typeof (tag.value) !== 'object') {
-          let res = RegExp.test(tag.value);
-          if (!res) {
-            throw Error('Tag Name: ' + tag.tagName + '. Type of value is not positive integer.');
-          }
-        } else {
-          for (let key in tag.value) {
-            if (!RegExp.test(tag.value[key])) {
-              throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not positive integer.');
+          break;
+        case edgeEnum.tagType.discrete:
+          let RegExp = /^\d+$/;
+          if (typeof (tag.value) !== 'object') {
+            let res = RegExp.test(tag.value);
+            if (!res) {
+              throw Error('Tag Name: ' + tag.tagName + '. Type of value is not positive integer.');
+            }
+          } else {
+            for (let key in tag.value) {
+              if (!RegExp.test(tag.value[key])) {
+                throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not positive integer.');
+              }
             }
           }
-        }
-        break;
-      case edgeEnum.tagType.text:
-        if (typeof (tag.value) !== 'object') {
-          if (typeof (tag.value) !== 'string') {
-            throw Error('Tag Name: ' + tag.tagName + '. Type of value is not string.');
-          }
-        } else {
-          for (let key in tag.value) {
-            if (typeof (tag.value[key]) !== 'string') {
-              throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not string');
+          break;
+        case edgeEnum.tagType.text:
+          if (typeof (tag.value) !== 'object') {
+            if (typeof (tag.value) !== 'string') {
+              throw Error('Tag Name: ' + tag.tagName + '. Type of value is not string.');
+            }
+          } else {
+            for (let key in tag.value) {
+              if (typeof (tag.value[key]) !== 'string') {
+                throw Error('Tag Name: ' + tag.tagName + ', index: ' + key + ' type is not string');
+              }
             }
           }
-        }
-        break;
+          break;
+      }
     }
+  } catch (error) {
+    console.error('_checkTypeOfTagValue error: ' + error);
   }
 }
 
 module.exports = {
   convertWholeConfig: _convertWholeConfig,
   convertData: _convertData,
-  convertDeviceStatus: _convertDeviceStatus
+  convertDeviceStatus: _convertDeviceStatus,
+  convertDeleteConfig: _convertDeleteConfig
 };

@@ -109,15 +109,16 @@ class EdgeAgent {
         }
         switch (action) {
           case edgeEnum.actionType.create:
+          case edgeEnum.actionType.update:
+          case edgeEnum.actionType.delsert:
             message = converter.convertWholeConfig(action, this._options.nodeId, edgeConfig, this._options.heartbeat);
             break;
-          case edgeEnum.actionType.update:
-            break;
           case edgeEnum.actionType.delete:
+            message = converter.convertDeleteConfig(action, this._options.nodeId, edgeConfig, 60);
             break;
         }
         if (Object.keys(message) !== 0) {
-          let result = _checkConfigIdentical(message);
+          let result = _checkConfigIdentical(message, action);
           if (!result) {
             this._client.publish(this._mqttTopic._configTopic, JSON.stringify(message), { qos: 1 });
           }
@@ -300,20 +301,34 @@ function _closeMQTTClient () {
   this._client.end(true, []);
 }
 
-function _checkConfigIdentical (message) {
-  constant.edgentConfig = JSON.stringify(message.d);
-  if (!fs.existsSync(constant.configFilePath)) {
-    fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
-    return false;
-  } else {
-    let data = fs.readFileSync(constant.configFilePath);
-    data = JSON.parse(data);
-    if (JSON.stringify(data.d) === JSON.stringify(message.d)) {
-      return true;
-    } else {
+function _checkConfigIdentical (message, action) {
+  if (action !== edgeEnum.actionType.delete) {
+    constant.edgentConfig = JSON.stringify(message.d);
+    if (!fs.existsSync(constant.configFilePath)) {
       fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
       return false;
+    } else {
+      let data = fs.readFileSync(constant.configFilePath);
+      data = JSON.parse(data);
+      if (JSON.stringify(data.d) === JSON.stringify(message.d)) {
+        return true;
+      } else {
+        fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
+        return false;
+      }
     }
+  } else { // delete 不存config 只讀config
+    let data = fs.readFileSync(constant.configFilePath);
+    data = JSON.parse(data);
+    // 執行delete時將Action修改存檔，這樣下一次upload不用刪除config.json
+    if (data.d.Action !== edgeEnum.actionType.delete) {
+      data.d.Action = edgeEnum.actionType.delete;
+      fs.writeFileSync(constant.configFilePath, JSON.stringify(data));
+    } else {
+      data.d.Action = edgeEnum.actionType.delete;
+    }
+    constant.edgentConfig = JSON.stringify(data.d);
+    return false;
   }
 }
 // function timeConvert (string) {

@@ -15,7 +15,8 @@ module.exports = {
   actionType: {
     create: 1,
     update: 2,
-    delete: 3
+    delete: 3,
+    delsert: 4
   },
   nodeConfigType: {
     node: 1,

@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 ## UnRelease
 ### Added
 - open vpn for linux
+- update, delete and delsert功能
 ### Update
 - 將scada相關字改為node
 ## [1.0.2] - 2020-03-05

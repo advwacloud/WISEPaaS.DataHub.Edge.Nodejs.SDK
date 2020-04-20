@@ -51,7 +51,7 @@ class TagObject {
   constructor (tagType, tagConfig) {
     this.Type = tagType;
     this.Desc = tagConfig && tagConfig.description ? tagConfig.description : '';
-    this.RO = tagConfig && tagConfig.readOnly ? tagConfig.readOnly : 0;
+    this.RO = tagConfig && tagConfig.readOnly ? 1 : 0;
     this.Ary = tagConfig && tagConfig.arraySize ? tagConfig.arraySize : 0;
   }
 }
