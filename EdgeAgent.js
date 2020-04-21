@@ -1,7 +1,7 @@
 'use strict';
 const events = require('events').EventEmitter;
 const fs = require('fs');
-const EdgeAgentOptions = require('./model/edge/EdgeAgentOptions');
+const edgeOptions = require('./model/edge/EdgeAgentOptions');
 const edgeEnum = require('./common/enum');
 const connHelper = require('./helpers/connectHelper');
 const dataRecoverHelper = require('./helpers/dataRecoverHelper');
@@ -14,7 +14,7 @@ const writeValCmd = require('./model/edge/WriteValueCommand');
 class EdgeAgent {
   constructor (options) {
     // this._options = new EdgeOptions.EdgeAgentOptions(options);
-    this._options = new EdgeAgentOptions(options);
+    this._options = new edgeOptions.EdgeAgentOptions(options);
     this._client = {};
     this._heartBeatInterval = {};
     this._dataRecoverInteval = {};
@@ -221,6 +221,13 @@ function _mqttDisconnected () {
     this.events.emit('disconnected');
     clearInterval(this._heartBeatInterval);
     clearInterval(this._dataRecoverInteval);
+    if (this._options.connectType === edgeEnum.connectType.DCCS) {
+      this._client.end(true, []);
+      connHelper.getCredentialFromDCCS.call(this).then(client => {
+        this._client = client;
+        _initEventFunction.call(this);
+      });
+    }
   } catch (error) {
     console.error('_mqttDisconnected function error: ' + error);
   }

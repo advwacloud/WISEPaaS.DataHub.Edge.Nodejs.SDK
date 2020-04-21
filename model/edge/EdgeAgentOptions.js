@@ -49,4 +49,7 @@ class MQTTOption {
   }
 }
 
-module.exports = EdgeAgentOptions;
+module.exports = {
+  EdgeAgentOptions,
+  MQTTOption
+};
