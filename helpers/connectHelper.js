@@ -42,8 +42,9 @@ function _getCredentialFromDCCS () {
       };
       if (this._options.useSecure) {
         mqttOptions.port = credential.protocols['mqtt+ssl'].port;
-        mqttOptions.userName = credential.protocols['mqtt+ssl'].username;
+        mqttOptions.username = credential.protocols['mqtt+ssl'].username;
         mqttOptions.password = credential.protocols['mqtt+ssl'].password;
+        mqttOptions.protocol = 'mqtts';
       } else {
         mqttOptions.port = credential.protocols.mqtt.port;
         mqttOptions.username = credential.protocols.mqtt.username;
