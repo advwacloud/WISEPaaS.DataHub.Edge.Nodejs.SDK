@@ -12,6 +12,9 @@ function _connectMQTTorDCCS () {
   return new Promise((resolve, reject) => {
     _openvpnConnect.call(this);
     if (this._options.connectType === edgeEnum.connectType.MQTT) {
+      if (this._options.MQTT.port === 8883) {
+        this._options.MQTT.protocol = 'mqtts';
+      }
       this._options.MQTT.will = {
         topic: `/wisepaas/scada/${this._options.nodeId}/conn`,
         payload: JSON.stringify(new LastWillMessage()),
