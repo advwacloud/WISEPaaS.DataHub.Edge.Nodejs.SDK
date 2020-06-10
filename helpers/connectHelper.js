@@ -14,6 +14,7 @@ function _connectMQTTorDCCS () {
     if (this._options.connectType === edgeEnum.connectType.MQTT) {
       if (this._options.MQTT.port === 8883) {
         this._options.MQTT.protocol = 'mqtts';
+        this._options.MQTT.mqttOptions.rejectUnauthorized = false;
       }
       this._options.MQTT.will = {
         topic: `/wisepaas/scada/${this._options.nodeId}/conn`,
@@ -47,6 +48,7 @@ function _getCredentialFromDCCS () {
         mqttOptions.port = credential.protocols['mqtt+ssl'].port;
         mqttOptions.username = credential.protocols['mqtt+ssl'].username;
         mqttOptions.password = credential.protocols['mqtt+ssl'].password;
+        mqttOptions.rejectUnauthorized = false;
         mqttOptions.protocol = 'mqtts';
       } else {
         mqttOptions.port = credential.protocols.mqtt.port;
