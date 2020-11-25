@@ -5,12 +5,12 @@ const path = require('path');
 const edgeOptions = require('./model/edge/EdgeAgentOptions');
 const edgeEnum = require('./common/enum');
 const connHelper = require('./helpers/connectHelper');
-const dataRecoverHelper = require('./helpers/dataRecoverHelper');
 const converter = require('./common/converter');
 const constant = require('./common/const');
 const HeartBeatMessage = require('./model/MQTTMessages/HeartBeatMessage');
 const ConnectMessage = require('./model/MQTTMessages/ConnectMessage');
 const DisconnectMessage = require('./model/MQTTMessages/DisconnectMessage');
+const DataRecover = require('./model/edge/DataRecover');
 const writeValCmd = require('./model/edge/WriteValueCommand');
 class EdgeAgent {
   constructor (options) {
@@ -34,9 +34,7 @@ class EdgeAgent {
     };
     this._configPath = _configPathCovert(options.nodeId);
     this._configObj = {};
-    this._dataRecoverPath = dataRecoverHelper.dataRecoverPath(options.nodeId);
-    this._db = null;
-    // dataRecoverHelper.init();
+    this._dataRecover = new DataRecover(options.nodeId);
   }
 
   connect (callback) {
@@ -150,12 +148,12 @@ class EdgeAgent {
         }
         let msgArray = converter.convertData(data, this._options.nodeId, this._configPath, this._configObj);
         if (this._client.connected === false) {
-          dataRecoverHelper.write(this._db, msgArray);
+          this._dataRecover.write(msgArray);
         } else {
           for (let msg of msgArray) {
             this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 }, (error) => {
               if (error) {
-                dataRecoverHelper.write(this._db, msg);
+                this._dataRecover.write(msg);
                 console.log('publish error = ' + error);
                 result = false;
                 reject(error);
@@ -201,7 +199,7 @@ function _initEventFunction () {
   });
 }
 
-async function _mqttConnected () {
+function _mqttConnected () {
   try {
     this.events.emit('connected');
     _sendConnectMessage.call(this);
@@ -209,7 +207,9 @@ async function _mqttConnected () {
       this._heartBeatInterval = setInterval(_sendHeartBeatMessage.bind(this), this._options.heartbeat);
     }
     if (this._options.dataRecover) {
-      this._db = dataRecoverHelper.init.call(this, this._dataRecoverPath);
+      if (!this._dataRecover) {
+        this._dataRecover = new DataRecover(this._options.nodeId);
+      }
       this._dataRecoverInteval = setInterval(_dataRecoverMessage.bind(this), constant.DEAFAULT_DATARECOVER_INTERVAL);
     }
     this._client.subscribe(this._mqttTopic._cmdTopic);
@@ -284,15 +284,16 @@ function _dataRecoverMessage () {
   if (this._client.connected === false) {
     return;
   }
-  dataRecoverHelper.dataAvailable((res) => {
+
+  this._dataRecover.dataAvailable((res) => {
     if (res) {
-      dataRecoverHelper.read(this._db, constant.DEAFAULT_DATARECOVER_COUNT, (message) => {
+      this._dataRecover.read(constant.DEAFAULT_DATARECOVER_COUNT, (message) => {
         for (let msg of message) {
           this._client.publish(this._mqttTopic._dataTopic, msg, { qos: 1 });
         }
       });
     }
-  }, this._db, this._dataRecoverPath);
+  });
 }
 
 function _sendHeartBeatMessage () {

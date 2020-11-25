@@ -1,3 +1,4 @@
 /node_modules
-/recover.sqlite.db
+/*.sqlite.db
+/*.json
 /.vscode

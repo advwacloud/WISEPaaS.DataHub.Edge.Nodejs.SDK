@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-
+## [1.0.4] - 2020-11-25
+### Updated
+- 將fraction point轉換移除
+- 將config.json & recover.db 加上nodeId prefix
+- 將dataRecover獨立成一個物件，包含創建db物件db path
 ## [1.0.3] - 2020-05-18
 ### Added
 - open vpn for linux
