@@ -1,6 +1,7 @@
 'use strict';
 const events = require('events').EventEmitter;
 const fs = require('fs');
+const path = require('path');
 const edgeOptions = require('./model/edge/EdgeAgentOptions');
 const edgeEnum = require('./common/enum');
 const connHelper = require('./helpers/connectHelper');
@@ -31,6 +32,10 @@ class EdgeAgent {
       _cfgAckTopic: `/wisepaas/scada/${options.nodeId}/cfgack`,
       _cmdTopic: options.type === edgeEnum.edgeType.Gateway ? `/wisepaas/scada/${options.nodeId}/cmd` : `/wisepaas/scada/${options.nodeId}/${options.deviceId}/cmd`
     };
+    this._configPath = _configPathCovert(options.nodeId);
+    this._configObj = {};
+    this._dataRecoverPath = dataRecoverHelper.dataRecoverPath(options.nodeId);
+    this._db = null;
     // dataRecoverHelper.init();
   }
 
@@ -118,7 +123,7 @@ class EdgeAgent {
             break;
         }
         if (Object.keys(message) !== 0) {
-          _writeConfigFile(message, action);
+          _writeConfigFile.call(this, message, action);
           this._client.publish(this._mqttTopic._configTopic, JSON.stringify(message), { qos: 1 });
         }
         callback(null, result);
@@ -143,14 +148,14 @@ class EdgeAgent {
           reject(err);
           return callback(err, result);
         }
-        let msgArray = converter.convertData(data, this._options.nodeId);
+        let msgArray = converter.convertData(data, this._options.nodeId, this._configPath, this._configObj);
         if (this._client.connected === false) {
-          dataRecoverHelper.write(msgArray);
+          dataRecoverHelper.write(this._db, msgArray);
         } else {
           for (let msg of msgArray) {
             this._client.publish(this._mqttTopic._dataTopic, JSON.stringify(msg), { qos: 1 }, (error) => {
               if (error) {
-                dataRecoverHelper.write(msg);
+                dataRecoverHelper.write(this._db, msg);
                 console.log('publish error = ' + error);
                 result = false;
                 reject(error);
@@ -196,7 +201,7 @@ function _initEventFunction () {
   });
 }
 
-function _mqttConnected () {
+async function _mqttConnected () {
   try {
     this.events.emit('connected');
     _sendConnectMessage.call(this);
@@ -204,7 +209,7 @@ function _mqttConnected () {
       this._heartBeatInterval = setInterval(_sendHeartBeatMessage.bind(this), this._options.heartbeat);
     }
     if (this._options.dataRecover) {
-      dataRecoverHelper.init();
+      this._db = dataRecoverHelper.init.call(this, this._dataRecoverPath);
       this._dataRecoverInteval = setInterval(_dataRecoverMessage.bind(this), constant.DEAFAULT_DATARECOVER_INTERVAL);
     }
     this._client.subscribe(this._mqttTopic._cmdTopic);
@@ -281,13 +286,13 @@ function _dataRecoverMessage () {
   }
   dataRecoverHelper.dataAvailable((res) => {
     if (res) {
-      dataRecoverHelper.read(constant.DEAFAULT_DATARECOVER_COUNT, (message) => {
+      dataRecoverHelper.read(this._db, constant.DEAFAULT_DATARECOVER_COUNT, (message) => {
         for (let msg of message) {
           this._client.publish(this._mqttTopic._dataTopic, msg, { qos: 1 });
         }
       });
     }
-  });
+  }, this._db, this._dataRecoverPath);
 }
 
 function _sendHeartBeatMessage () {
@@ -308,11 +313,11 @@ function _closeMQTTClient () {
 
 function _writeConfigFile (message, action) {
   if (action === edgeEnum.actionType.create || action === edgeEnum.actionType.delsert) {
-    constant.edgentConfig = JSON.stringify(message.d);
-    if (!fs.existsSync(constant.configFilePath)) {
-      fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
+    this._configObj = message.d;
+    if (!fs.existsSync(this._configPath)) {
+      fs.writeFileSync(this._configPath, JSON.stringify(message));
     } else {
-      fs.writeFileSync(constant.configFilePath, JSON.stringify(message));
+      fs.writeFileSync(this._configPath, JSON.stringify(message));
     }
   }
   // else { // delete 不存config 只讀config
@@ -328,6 +333,11 @@ function _writeConfigFile (message, action) {
   //   constant.edgentConfig = JSON.stringify(data.d);
   //   return false;
   // }
+}
+
+function _configPathCovert (nodeId) {
+  let configPath = path.resolve(process.cwd(), './' + nodeId + '_config.json');
+  return configPath;
 }
 // function timeConvert (string) {
 //   // let timeNow = Date.now();

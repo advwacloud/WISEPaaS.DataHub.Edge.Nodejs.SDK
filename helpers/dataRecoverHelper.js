@@ -4,36 +4,34 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const gzip = require('./gZippedJson');
 
-const _dbFilePath = path.resolve(process.cwd(), './recover.sqlite.db');
-let _db = null;
-
-function _init () {
+function _init (dataRecoverPath) {
   try {
-    if (!_db) {
-      _db = new sqlite3.Database(_dbFilePath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, error => {
+    if (!this._db) {
+      this._db = new sqlite3.Database(dataRecoverPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, error => {
         if (error) {
           console.error('Establish database error: ' + error);
         }
       });
-      _db.serialize(() => {
-        _db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
+      this._db.serialize(() => {
+        this._db.run('CREATE TABLE IF NOT EXISTS Data (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, message TEXT NOT NULL)', error => {
           if (error) {
             console.error('Create data table error: ' + error);
             throw error;
           }
         });
-        _db.exec('VACUUM');
+        this._db.exec('VACUUM');
       });
     }
+    return this._db;
   } catch (error) {
     console.error('init database function error: ' + error);
   }
 }
 
-function _dataAvailable (callback) {
+function _dataAvailable (callback, _db, dataRecoverPath) {
   try {
     let result = false;
-    if (!fs.existsSync(_dbFilePath)) {
+    if (!fs.existsSync(dataRecoverPath)) {
       return callback(result);
     }
     _db.all('SELECT * FROM Data LIMIT 1', (err, res) => {
@@ -53,7 +51,7 @@ function _dataAvailable (callback) {
   }
 }
 
-function _read (count, callback) {
+function _read (_db, count, callback) {
   try {
     _db.all('SELECT * FROM Data LIMIT @Count', count, (error, row) => {
       if (error) {
@@ -82,7 +80,7 @@ function _read (count, callback) {
   }
 }
 
-function _write (message) {
+function _write (_db, message) {
   try {
     _db.serialize(() => {
       _db.run('BEGIN');
@@ -95,10 +93,10 @@ function _write (message) {
         });
         if (Array.isArray(message)) {
           for (let msg of message) {
-            _writeMsgToDB(msg);
+            _writeMsgToDB(_db, msg);
           }
         } else {
-          _writeMsgToDB(message);
+          _writeMsgToDB(_db, message);
         }
         _db.run('COMMIT');
       } catch (error) {
@@ -123,7 +121,7 @@ function _queryString (idList) {
   return res;
 }
 
-function _writeMsgToDB (msg) {
+function _writeMsgToDB (_db, msg) {
   let result = gzip.compressToBase64String(msg);
   _db.run('INSERT INTO Data (message) VALUES (@Message)', result, error => {
     if (error) {
@@ -131,6 +129,11 @@ function _writeMsgToDB (msg) {
       throw error;
     }
   });
+}
+
+function _dataRecoverPath (nodeId) {
+  let dataRecoverPath = path.resolve(process.cwd(), './' + nodeId + '_recover.sqlite.db');
+  return dataRecoverPath;
 }
 // function timeConvert (string) {
 //   // let timeNow = Date.now();
@@ -142,5 +145,6 @@ module.exports = {
   init: _init,
   dataAvailable: _dataAvailable,
   read: _read,
-  write: _write
+  write: _write,
+  dataRecoverPath: _dataRecoverPath
 };

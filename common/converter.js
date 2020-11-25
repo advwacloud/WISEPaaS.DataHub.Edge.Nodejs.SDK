@@ -1,7 +1,6 @@
 
 'use strict';
 const assert = require('assert');
-const fs = require('fs');
 const configMessage = require('../model/MQTTMessages/ConfigMessage');
 const DataMessage = require('../model/MQTTMessages/DataMessage');
 const DeviceStatusMessage = require('../model/MQTTMessages/DeviceStatusMessage');
@@ -84,7 +83,7 @@ function _convertDeleteConfig (action, nodeId, edgeConfig) {
   return msg;
 }
 
-function _convertData (data, nodeId) {
+function _convertData (data, nodeId, configPath, configObj) {
   let result = [];
   let msg = new DataMessage();
   let count = 0;
@@ -95,12 +94,13 @@ function _convertData (data, nodeId) {
     if (!msg.d[tag.deviceId]) {
       msg.d[tag.deviceId] = {};
     }
-    if (fs.existsSync(Const.configFilePath)) {
-      _checkTypeOfTagValue(tag, nodeId);
-      msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, nodeId);
-    } else {
-      msg.d[tag.deviceId][tag.tagName] = tag.value;
-    }
+    // if (fs.existsSync(configPath)) {
+    //   _checkTypeOfTagValue(tag, nodeId, configObj);
+    //   msg.d[tag.deviceId][tag.tagName] = _fractionDisplayFormat(tag, nodeId, configObj);
+    // } else {
+    //   msg.d[tag.deviceId][tag.tagName] = tag.value;
+    // }
+    msg.d[tag.deviceId][tag.tagName] = tag.value;
     count++;
     if (count === Const.packageSize || i === data.tagList.length - 1) {
       msg.ts = data.ts;
@@ -129,9 +129,9 @@ function _convertDeviceStatus (deviceStatus) {
   }
 }
 
-function _fractionDisplayFormat (tag, nodeId) {
+function _fractionDisplayFormat (tag, nodeId, configObj) {
   try {
-    let edgentConfig = JSON.parse(Const.edgentConfig);
+    let edgentConfig = configObj;
     if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
       let fractionVal = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].FDF;
       if (fractionVal) {
@@ -153,9 +153,9 @@ function _fractionDisplayFormat (tag, nodeId) {
   }
 }
 
-function _checkTypeOfTagValue (tag, nodeId) {
+function _checkTypeOfTagValue (tag, nodeId, configObj) {
   try {
-    let edgentConfig = JSON.parse(Const.edgentConfig);
+    let edgentConfig = configObj;
     if (edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName]) {
       let type = edgentConfig.Scada[nodeId].Device[tag.deviceId].Tag[tag.tagName].Type;
       switch (type) {
