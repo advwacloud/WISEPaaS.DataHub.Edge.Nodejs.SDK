@@ -58,6 +58,9 @@ class EdgeAgent {
           console.log(error.message);
           reject(error);
           callback(error, result);
+        }).catch(err => {
+          reject(err);
+          console.log(err);
         });
       } catch (error) {
         callback(error, result);

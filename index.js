@@ -4,6 +4,7 @@ const edgeConfig = require('./model/edge/EdgeConfig');
 const edgeData = require('./model/edge/EdgeData');
 const edgeDeviceStatus = require('./model/edge/EdgeDeviceStatus');
 const edgeEnum = require('./common/enum');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 module.exports = {
   EdgeAgent,
