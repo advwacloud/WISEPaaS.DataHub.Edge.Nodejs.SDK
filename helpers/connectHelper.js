@@ -70,7 +70,7 @@ function _getCredentialFromDCCS () {
     }, err => { // DCCS 失敗的話隨便給一個IP 為了是成功建立一個mqtt obj，可以監聽disconnect事件並且重新retry 2020/12/09
       console.log('get DCCS fail: ' + err);
       let mqttOptions = new edgeOptions.MQTTOption({});
-      mqttOptions.host = '127.123';
+      mqttOptions.host = '127.0.0.256';
       let client = mqtt.connect(mqttOptions);
       resolve(client);
     }).catch(err => {
