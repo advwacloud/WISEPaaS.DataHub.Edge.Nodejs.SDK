@@ -19,6 +19,7 @@ class EdgeAgent {
     this._client = {};
     this._heartBeatInterval = {};
     this._dataRecoverInteval = {};
+    this._reconnectInterval = {};
     // this._recoverHelper = new DataRecoverHelper();
     this.events = new events.EventEmitter();
     this._mqttTopic = {
@@ -228,11 +229,17 @@ function _mqttDisconnected () {
     clearInterval(this._heartBeatInterval);
     clearInterval(this._dataRecoverInteval);
     if (this._options.connectType === edgeEnum.connectType.DCCS) {
-      this._client.end(true, []);
-      connHelper.getCredentialFromDCCS.call(this).then(client => {
-        this._client = client;
-        _initEventFunction.call(this);
-      });
+      // 為了讓DCCS不要一連線失敗就call api,增加this._reconnectInterval去判斷有沒有call過了
+      if (Object.keys(this._reconnectInterval).length === 0) {
+        this._reconnectInterval = setTimeout(() => {
+          this._client.end(true, []);
+          connHelper.getCredentialFromDCCS.call(this).then(client => {
+            this._client = client;
+            _initEventFunction.call(this);
+            this._reconnectInterval = {};
+          });
+        }, this._options.reconnectInterval);
+      }
     }
   } catch (error) {
     console.error('_mqttDisconnected function error: ' + error);
