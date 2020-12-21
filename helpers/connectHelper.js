@@ -71,6 +71,7 @@ function _getCredentialFromDCCS () {
       console.log('get DCCS fail: ' + err);
       let mqttOptions = new edgeOptions.MQTTOption({});
       mqttOptions.host = '127.0.0.256';
+      mqttOptions.reconnectPeriod = 0;
       let client = mqtt.connect(mqttOptions);
       resolve(client);
     }).catch(err => {
