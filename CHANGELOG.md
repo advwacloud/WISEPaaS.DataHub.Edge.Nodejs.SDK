@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-## [Unrelease]
+## [1.0.6] - 2021-08-06
+### Updated
+- 取消 data 封包拆分機制
 ### Fixed
 - 修正斷線重連時產生多餘連線問題
 

@@ -1,6 +1,6 @@
 {
   "name": "wisepaas-datahub-edge-nodejs-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "garypan1990@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "mqtt": "4.2.6",
+    "mqtt": "4.2.8",
     "request": "2.88.2",
     "request-promise": "4.2.6",
     "sqlite3": "4.1.1"
