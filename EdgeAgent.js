@@ -232,7 +232,9 @@ function _mqttDisconnected () {
     }
     if (this._options.connectType === edgeEnum.connectType.DCCS) {
       // 為了讓DCCS不要一連線失敗就call api,增加this._reconnectInterval去判斷有沒有call過了
-      // this._client.end(true, []);
+      // todo: maybe use reconnect event is more better!
+      this._client.end(true, []);
+      this._client = null;
       setTimeout(() => {
         connHelper.getCredentialFromDCCS.call(this).then(client => {
           this._client = client;

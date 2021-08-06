@@ -1,5 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
+## [Unrelease]
+### Fixed
+- 修正斷線重連時產生多餘連線問題
 
 ## [1.0.5] - 2021-03-08
 ### Updated
