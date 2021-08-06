@@ -86,7 +86,6 @@ function _convertDeleteConfig (action, nodeId, edgeConfig) {
 function _convertData (data, nodeId, configPath, configObj) {
   let result = [];
   let msg = new DataMessage();
-  let count = 0;
   for (let i = 0; i < data.tagList.length; i++) {
     let tag = data.tagList[i];
     assert(tag.deviceId, 'Device ID is required when call the sendData function.');
@@ -101,14 +100,9 @@ function _convertData (data, nodeId, configPath, configObj) {
     //   msg.d[tag.deviceId][tag.tagName] = tag.value;
     // }
     msg.d[tag.deviceId][tag.tagName] = tag.value;
-    count++;
-    if (count === Const.packageSize || i === data.tagList.length - 1) {
-      msg.ts = data.ts;
-      result.push(msg);
-      msg = new DataMessage();
-      count = 0;
-    }
+    msg.ts = data.ts;
   }
+  result.push(msg);
   return result;
 }
 
